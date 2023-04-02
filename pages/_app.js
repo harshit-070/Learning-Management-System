@@ -26,74 +26,76 @@ import "../styles/responsive.css";
 import "../styles/dashboard.css";
 
 import Layout from "../components/_App/Layout";
+import connection from "@/database/connection";
 
 function MyApp({ Component, pageProps }) {
-	const store = useStore(pageProps.initialReduxState);
-	return (
-		<Provider store={store}>
-			<Layout>
-				<Component {...pageProps} />
-			</Layout>
-		</Provider>
-	);
+  connection.connect();
+  const store = useStore(pageProps.initialReduxState);
+  return (
+    <Provider store={store}>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </Provider>
+  );
 }
 
 MyApp.getInitialProps = async ({ Component, ctx }) => {
-	const { edmy_users_token } = parseCookies(ctx);
-	let pageProps = {};
+  const { edmy_users_token } = parseCookies(ctx);
+  let pageProps = {};
 
-	if (Component.getInitialProps) {
-		pageProps = await Component.getInitialProps(ctx);
-	}
+  if (Component.getInitialProps) {
+    pageProps = await Component.getInitialProps(ctx);
+  }
 
-	if (!edmy_users_token) {
-		// if a user not logged in then user can't access those pages
-		const isProtectedRoute =
-			ctx.pathname === "/profile/basic-information" ||
-			ctx.pathname === "/profile/photo" ||
-			ctx.pathname === "/checkout" ||
-			ctx.pathname === "/become-an-instructor" ||
-			ctx.pathname === "/learning/my-courses" ||
-			ctx.pathname === "/instructor/courses" ||
-			ctx.pathname === "/admin" ||
-			ctx.pathname === "/admin/instructor" ||
-			ctx.pathname === "/admin/students" ||
-			ctx.pathname === "/admin/partners" ||
-			ctx.pathname === "/admin/testimonials" ||
-			ctx.pathname === "/admin/categories" ||
-			ctx.pathname === "/checkout" ||
-			ctx.pathname === "/learning/wishlist";
+  if (!edmy_users_token) {
+    // if a user not logged in then user can't access those pages
+    const isProtectedRoute =
+      ctx.pathname === "/profile/basic-information" ||
+      ctx.pathname === "/profile/photo" ||
+      ctx.pathname === "/checkout" ||
+      ctx.pathname === "/become-an-instructor" ||
+      ctx.pathname === "/learning/my-courses" ||
+      ctx.pathname === "/instructor/courses" ||
+      ctx.pathname === "/admin" ||
+      ctx.pathname === "/admin/instructor" ||
+      ctx.pathname === "/admin/students" ||
+      ctx.pathname === "/admin/partners" ||
+      ctx.pathname === "/admin/testimonials" ||
+      ctx.pathname === "/admin/categories" ||
+      ctx.pathname === "/checkout" ||
+      ctx.pathname === "/learning/wishlist";
 
-		if (isProtectedRoute) {
-			redirectUser(ctx, "/auth");
-		}
-	} else {
-		// if a user logged in then user can't access those pages
-		const ifLoggedIn =
-			ctx.pathname === "/auth" || ctx.pathname === "/reset-password";
-		if (ifLoggedIn) {
-			redirectUser(ctx, "/");
-		}
+    if (isProtectedRoute) {
+      redirectUser(ctx, "/auth");
+    }
+  } else {
+    // if a user logged in then user can't access those pages
+    const ifLoggedIn =
+      ctx.pathname === "/auth" || ctx.pathname === "/reset-password";
+    if (ifLoggedIn) {
+      redirectUser(ctx, "/");
+    }
 
-		try {
-			const payload = { headers: { Authorization: edmy_users_token } };
-			const url = `${baseUrl}/api/users/update`;
-			const response = await axios.get(url, payload);
-			const user = response && response.data.user;
+    try {
+      const payload = { headers: { Authorization: edmy_users_token } };
+      const url = `${baseUrl}/api/users/update`;
+      const response = await axios.get(url, payload);
+      const user = response && response.data.user;
 
-			if (!user) {
-				destroyCookie(ctx, "edmy_users_token");
-				redirectUser(ctx, "/auth");
-			}
-			pageProps.user = user;
-		} catch (err) {
-			destroyCookie(ctx, "edmy_users_token");
-			// redirectUser(ctx, "/");
-		}
-	}
-	return {
-		pageProps,
-	};
+      if (!user) {
+        destroyCookie(ctx, "edmy_users_token");
+        redirectUser(ctx, "/auth");
+      }
+      pageProps.user = user;
+    } catch (err) {
+      destroyCookie(ctx, "edmy_users_token");
+      // redirectUser(ctx, "/");
+    }
+  }
+  return {
+    pageProps,
+  };
 };
 
 export default MyApp;

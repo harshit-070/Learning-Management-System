@@ -1,62 +1,35 @@
-import { Model, DataTypes } from "sequelize";
-import connection from "../connection";
+import mongoose from "mongoose";
+if (!mongoose.models.Video) {
+  const videoSchema = new mongoose.Schema(
+    {
+      group_name: { type: String },
+      title: { type: String },
+      thumb: { type: String },
+      video: { type: String },
+      video_length: { type: Number },
+      is_preview: { type: Boolean },
+      short_id: { type: Number },
+      assets_zip: { type: String },
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      courseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+        required: true,
+      },
+    },
+    {
+      timestamps: {
+        createdAt: "created_at",
+        updatedAt: "updated_at",
+      },
+    }
+  );
 
-const initVideo = (sequelize, Types) => {
-	class Video extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate(models) {
-			// define association here
-		}
-	}
-	Video.init(
-		{
-			id: {
-				type: Types.UUID,
-				defaultValue: Types.UUIDV4,
-				primaryKey: true,
-			},
-			group_name: DataTypes.STRING,
-			title: DataTypes.STRING,
-			thumb: DataTypes.STRING,
-			video: DataTypes.STRING,
-			video_length: DataTypes.FLOAT,
-			is_preview: DataTypes.BOOLEAN,
-			short_id: DataTypes.INTEGER,
-			assets_zip: DataTypes.STRING,
-			userId: {
-				type: DataTypes.UUID,
-				allowNull: false,
-				onDelete: "CASCADE",
-				references: {
-					model: "users",
-					key: "id",
-					as: "userId",
-				},
-			},
-			courseId: {
-				type: DataTypes.UUID,
-				allowNull: false,
-				onDelete: "CASCADE",
-				references: {
-					model: "courses",
-					key: "id",
-					as: "courseId",
-				},
-			},
-		},
-		{
-			sequelize,
-			modelName: "Video",
-			tableName: "videos",
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-		}
-	);
-	return Video;
-};
-
-export default initVideo(connection, DataTypes);
+  Video = mongoose.model("Video", videoSchema);
+}
+let Video = mongoose.model("Video");
+export default Video;

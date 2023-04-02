@@ -2,12 +2,12 @@ import baseUrl from "@/utils/baseUrl";
 import { transport } from "./config";
 
 export const confirmEmailAddress = async (user) => {
-	// console.log(user.email)
-	const data = {
-		to: user.email,
-		from: "Edmy Online Courses <hello@hibootstrap.com>",
-		subject: "Confirm Your Email Address",
-		html: `
+  // console.log(user.email)
+  const data = {
+    to: user.email,
+    from: "Edmy Online Courses <hello@hibootstrap.com>",
+    subject: "Confirm Your Email Address",
+    html: `
         <!DOCTYPE html>
         <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
         <head>
@@ -355,15 +355,15 @@ export const confirmEmailAddress = async (user) => {
         </body>
         </html>
         `,
-	};
+  };
 
-	try {
-		await transport.sendMail(data);
-		// console.log("Email send successfully")
-		// res.status(200).send("Email send successfully")
-	} catch (error) {
-		console.log(error);
-		// res.status(500).send("Error proccessing charge");
-	}
-	transport.close();
+  try {
+    await transport.sendMail(data);
+    // console.log("Email send successfully")
+    // res.status(200).send("Email send successfully")
+  } catch (error) {
+    console.log(error);
+    // res.status(500).send("Error proccessing charge");
+  }
+  transport.close();
 };

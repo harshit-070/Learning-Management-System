@@ -7,72 +7,73 @@ import { calculateCartTotal } from "@/utils/calculateCartTotal";
 const stripeSecret = Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
-	switch (req.method) {
-		case "POST":
-			await handlePostRequest(req, res);
-			break;
-		default:
-			res.status(405).json({
-				message: `Method ${req.method} not allowed`,
-			});
-	}
+  switch (req.method) {
+    case "POST":
+      await handlePostRequest(req, res);
+      break;
+    default:
+      res.status(405).json({
+        message: `Method ${req.method} not allowed`,
+      });
+  }
 }
 
 const handlePostRequest = async (req, res) => {
-	const { cartItems, userId, buyer_name, buyer_email, buyer_avatar } =
-		req.body;
+  const { cartItems, userId, buyer_name, buyer_email, buyer_avatar } = req.body;
 
-	const { stripeTotal } = calculateCartTotal(cartItems);
+  const { stripeTotal } = calculateCartTotal(cartItems);
 
-	try {
-		await stripeSecret.charges.create(
-			{
-				amount: stripeTotal,
-				currency: "usd",
-				source: "tok_mastercard",
-				receipt_email: buyer_email,
-				description: `Checkout | ${buyer_email} | ${userId}`,
-			},
-			{
-				idempotencyKey: uuidv4(),
-			}
-		);
+  try {
+    await stripeSecret.charges.create(
+      {
+        amount: stripeTotal,
+        currency: "usd",
+        source: "tok_mastercard",
+        receipt_email: buyer_email,
+        description: `Checkout | ${buyer_email} | ${userId}`,
+      },
+      {
+        idempotencyKey: uuidv4(),
+      }
+    );
 
-		cartItems.forEach(async (cart) => {
-			Enrolment.create({
-				bought_price: cart.price,
-				payment_method: "Card",
-				buyer_name: buyer_name,
-				buyer_email: buyer_email,
-				buyer_avatar: buyer_avatar,
-				userId: userId,
-				courseId: cart.id,
-				status: "paid",
-			});
+    cartItems.forEach(async (cart) => {
+      Enrolment.create({
+        bought_price: cart.price,
+        payment_method: "Card",
+        buyer_name: buyer_name,
+        buyer_email: buyer_email,
+        buyer_avatar: buyer_avatar,
+        userId: userId,
+        courseId: cart._id,
+        status: "paid",
+      });
 
-			const courseInstractor = await Course.findOne({
-				attributes: ["userId"],
-				where: { id: cart.id },
-			});
+      const courseInstructor = await Course.findOne(
+        {
+          _id: cart._id,
+        },
+        { userId: 1 }
+      );
 
-			await Instructor_Earning.create({
-				earnings: cart.price,
-				userId: courseInstractor.userId,
-				courseId: cart.id,
-			});
-		});
+      await Instructor_Earning.create({
+        earnings: cart.price,
+        userId: courseInstructor.userId,
+        courseId: cart._id,
+      });
+    });
 
-		// console.log(cartItems);
+    // console.log(cartItems);
 
-		// checkoutConfirmation(cartItems, buyer_name, buyer_email);
+    // checkoutConfirmation(cartItems, buyer_name, buyer_email);
 
-		res.status(200).json({
-			message: "Enroled successfully.",
-		});
-	} catch (e) {
-		res.status(400).json({
-			error_code: "create_enroled",
-			message: e.message,
-		});
-	}
+    res.status(200).json({
+      message: "Enroled successfully.",
+    });
+  } catch (e) {
+    res.status(400).json({
+      error_code: "create_enroled",
+      message: e.message,
+    });
+  }
 };

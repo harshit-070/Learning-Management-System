@@ -1,38 +1,26 @@
-import { Model, DataTypes } from "sequelize";
-import connection from "../connection";
+import mongoose from "mongoose";
 
-const initTestimonial = (sequelize, Types) => {
-	class Testimonial extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate(models) {
-			// define association here
-		}
-	}
-	Testimonial.init(
-		{
-			id: {
-				type: Types.UUID,
-				defaultValue: Types.UUIDV4,
-				primaryKey: true,
-			},
-			image_url: DataTypes.STRING,
-			name: DataTypes.STRING,
-			designation: DataTypes.STRING,
-			description: DataTypes.TEXT,
-		},
-		{
-			sequelize,
-			modelName: "Testimonial",
-			tableName: "testimonials",
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-		}
-	);
-	return Testimonial;
-};
+if (!mongoose.models.Testimonial) {
+  const testimonialSchema = new mongoose.Schema(
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        index: true,
+        required: true,
+        auto: true,
+        alias: "_id",
+      },
+      image_url: { type: String, required: true },
+      name: { type: String, required: true },
+      designation: { type: String, required: true },
+      description: { type: String, required: true },
+    },
+    {
+      timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+    }
+  );
 
-export default initTestimonial(connection, DataTypes);
+  Testimonial = mongoose.model("Testimonial", testimonialSchema);
+}
+let Testimonial = mongoose.model("Testimonial");
+export default Testimonial;

@@ -1,60 +1,43 @@
-import { Model, DataTypes } from "sequelize";
-import connection from "../connection";
+import mongoose from "mongoose";
 
-const initInstructor_Earning = (sequelize, Types) => {
-	class Instructor_Earning extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate(models) {
-			// define association here
-		}
-	}
-	Instructor_Earning.init(
-		{
-			id: {
-				type: Types.UUID,
-				defaultValue: Types.UUIDV4,
-				primaryKey: true,
-			},
-			earnings: DataTypes.FLOAT,
-			userId: {
-				type: DataTypes.UUID,
-				allowNull: false,
-				onDelete: "CASCADE",
-				references: {
-					model: "users",
-					key: "id",
-					as: "userId",
-				},
-			},
-			courseId: {
-				type: DataTypes.UUID,
-				allowNull: false,
-				onDelete: "CASCADE",
-				references: {
-					model: "courses",
-					key: "id",
-					as: "courseId",
-				},
-			},
-			status: {
-				type: DataTypes.ENUM,
-				values: ["due", "paid", "cancelled"],
-				defaultValue: "due",
-			},
-		},
-		{
-			sequelize,
-			modelName: "Instructor_Earning",
-			tableName: "instructor_earnings",
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-		}
-	);
-	return Instructor_Earning;
-};
+if (!mongoose.models.Instructor_Earning) {
+  const instructorEarningSchema = new mongoose.Schema(
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        index: true,
+        required: true,
+        auto: true,
+        alias: "_id",
+      },
+      earnings: {
+        type: Number,
+        required: true,
+      },
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      courseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+        required: true,
+      },
+      status: {
+        type: String,
+        enum: ["due", "paid", "cancelled"],
+        default: "due",
+      },
+    },
+    { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+  );
 
-export default initInstructor_Earning(connection, DataTypes);
+  let Instructor_Earning = mongoose.model(
+    "Instructor_Earning",
+    instructorEarningSchema
+  );
+}
+let Instructor_Earning = mongoose.model("Instructor_Earning");
+
+export default Instructor_Earning;
