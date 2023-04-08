@@ -1,36 +1,33 @@
-import { Model, DataTypes } from "sequelize";
-import connection from "../connection";
+import mongoose from "mongoose";
 
-const initSubscription = (sequelize, Types) => {
-	class Subscription extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate(models) {
-			// define association here
-		}
-	}
-	Subscription.init(
-		{
-			id: {
-				type: Types.UUID,
-				defaultValue: Types.UUIDV4,
-				primaryKey: true,
-			},
-			email: DataTypes.STRING,
-			active: DataTypes.BOOLEAN,
-		},
-		{
-			sequelize,
-			modelName: "Subscription",
-			tableName: "subscriptions",
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-		}
-	);
-	return Subscription;
-};
-
-export default initSubscription(connection, DataTypes);
+if (!mongoose.models.Subscription) {
+  const subscriptionSchema = new mongoose.Schema(
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        index: true,
+        required: true,
+        auto: true,
+        alias: "_id",
+      },
+      email: {
+        type: String,
+        required: true,
+        unique: true,
+      },
+      active: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    {
+      timestamps: {
+        createdAt: "created_at",
+        updatedAt: "updated_at",
+      },
+    }
+  );
+  let Subscription = mongoose.model("Subscription", subscriptionSchema);
+}
+let Subscription = mongoose.model("Subscription");
+export default Subscription;

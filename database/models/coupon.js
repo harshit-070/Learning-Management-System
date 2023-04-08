@@ -1,40 +1,48 @@
-import { Model, DataTypes } from "sequelize";
-import connection from "../connection";
+import mongoose from "mongoose";
 
-const initCoupon = (sequelize, Types) => {
-	class Coupon extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate(models) {
-			// define association here
-		}
-	}
-	Coupon.init(
-		{
-			id: {
-				type: DataTypes.UUID,
-				defaultValue: DataTypes.UUIDV4,
-				primaryKey: true,
-			},
-			code: DataTypes.STRING,
-			discount: DataTypes.FLOAT,
-			exp_date: DataTypes.DATE,
-			status: DataTypes.BOOLEAN,
-			deleted_at: DataTypes.DATE,
-			active_for_full_site: DataTypes.BOOLEAN,
-		},
-		{
-			sequelize,
-			modelName: "Coupon",
-			tableName: "coupons",
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-		}
-	);
-	return Coupon;
-};
+if (!mongoose.models.Coupon) {
+  const couponSchema = new mongoose.Schema(
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        index: true,
+        required: true,
+        auto: true,
+        alias: "_id",
+      },
+      code: {
+        type: String,
+        required: true,
+      },
+      discount: {
+        type: Number,
+        required: true,
+      },
+      exp_date: {
+        type: Date,
+        required: true,
+      },
+      status: {
+        type: Boolean,
+        required: true,
+      },
+      deleted_at: {
+        type: Date,
+      },
+      active_for_full_site: {
+        type: Boolean,
+        required: true,
+      },
+    },
+    {
+      timestamps: {
+        createdAt: "created_at",
+        updatedAt: "updated_at",
+      },
+    }
+  );
 
-export default initCoupon(connection, DataTypes);
+  let Coupon = mongoose.model("Coupon", couponSchema);
+}
+let Coupon = mongoose.model("Coupon");
+export default Coupon;

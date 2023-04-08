@@ -1,35 +1,32 @@
-import { Model, DataTypes } from "sequelize";
-import connection from "../connection";
+import mongoose from "mongoose";
 
-const initPartner = (sequelize, Types) => {
-	class Partner extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate(models) {
-			// define association here
-		}
-	}
-	Partner.init(
-		{
-			id: {
-				type: Types.UUID,
-				defaultValue: Types.UUIDV4,
-				primaryKey: true,
-			},
-			name: DataTypes.STRING,
-			partner_image: DataTypes.STRING,
-		},
-		{
-			sequelize,
-			modelName: "Partner",
-			tableName: "partners",
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-		}
-	);
-	return Partner;
-};
-export default initPartner(connection, DataTypes);
+if (!mongoose.models.Partner) {
+  const partnerSchema = new mongoose.Schema(
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        index: true,
+        required: true,
+        auto: true,
+        alias: "_id",
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      partner_image: {
+        type: String,
+      },
+    },
+    {
+      timestamps: {
+        createdAt: "created_at",
+        updatedAt: "updated_at",
+      },
+    }
+  );
+
+  let Partner = mongoose.model("Partner", partnerSchema);
+}
+let Partner = mongoose.model("Partner");
+export default Partner;

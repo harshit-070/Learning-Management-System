@@ -1,54 +1,33 @@
-import { Model, DataTypes } from "sequelize";
-import connection from "../connection";
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const initFavourite = (sequelize, Types) => {
-	class Favourite extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate(models) {
-			// define association here
-		}
-	}
-	Favourite.init(
-		{
-			id: {
-				type: Types.UUID,
-				defaultValue: Types.UUIDV4,
-				primaryKey: true,
-			},
-			userId: {
-				type: Types.UUID,
-				allowNull: false,
-				onDelete: "CASCADE",
-				references: {
-					model: "users",
-					key: "id",
-					as: "userId",
-				},
-			},
-			courseId: {
-				type: Types.UUID,
-				allowNull: false,
-				onDelete: "CASCADE",
-				references: {
-					model: "courses",
-					key: "id",
-					as: "courseId",
-				},
-			},
-		},
-		{
-			sequelize,
-			modelName: "Favourite",
-			tableName: "favourites",
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-		}
-	);
-	return Favourite;
-};
+if (!mongoose.models.Favourite) {
+  const favouriteSchema = new Schema(
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        index: true,
+        required: true,
+        auto: true,
+        alias: "_id",
+      },
+      userId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: "User",
+      },
+      courseId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: "Course",
+      },
+    },
+    {
+      timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+    }
+  );
 
-export default initFavourite(connection, DataTypes);
+  let Favourite = mongoose.model("Favourite", favouriteSchema);
+}
+let Favourite = mongoose.model("Favourite");
+module.exports = Favourite;

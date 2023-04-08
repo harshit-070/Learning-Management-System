@@ -1,51 +1,69 @@
-import Sequelize from "sequelize";
 import { Course, User, Enrolment, Category } from "database/models";
 
 export default async function handler(req, res) {
-	switch (req.method) {
-		case "GET":
-			await handleGetRequest(req, res);
-			break;
-		default:
-			res.status(405).json({
-				message: `Method ${req.method} not allowed`,
-			});
-	}
+  switch (req.method) {
+    case "GET":
+      await handleGetRequest(req, res);
+      break;
+    default:
+      res.status(405).json({
+        message: `Method ${req.method} not allowed`,
+      });
+  }
 }
 
 const handleGetRequest = async (req, res) => {
-	try {
-		const courses = await Course.findAll({
-			order: Sequelize.literal("rand()"),
-			limit: 4,
-			include: [
-				{
-					model: User,
-					as: "user",
-					attributes: ["first_name", "last_name", "profile_photo"],
-				},
-				{
-					model: Enrolment,
-					as: "enrolments",
-					attributes: ["id"],
-				},
-			],
-			where: { in_home_page: true, approved: true },
-		});
+  try {
+    console.log("Request Called");
+    const courses = await Course.aggregate([
+      { $match: { in_home_page: true, approved: true } },
+      { $sample: { size: 4 } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $lookup: {
+          from: "enrolments",
+          localField: "_id",
+          foreignField: "courseId",
+          as: "enrolments",
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          slug: 1,
+          duration: 1,
+          lessons: 1,
+          image: 1,
+          access_time: 1,
+          user: {
+            first_name: 1,
+            last_name: 1,
+            profile_photo: 1,
+          },
+          enrolments: {
+            $size: "$enrolments",
+          },
+        },
+      },
+    ]);
 
-		const categories = await Category.findAll({
-			order: Sequelize.literal("rand()"),
-			limit: 12,
-		});
-
-		res.status(200).json({
-			courses,
-			categories,
-		});
-	} catch (e) {
-		res.status(400).json({
-			error_code: "get_my_courses",
-			message: e.message,
-		});
-	}
+    const categories = await Category.aggregate([{ $sample: { size: 12 } }]);
+    res.status(200).json({
+      courses,
+      categories,
+    });
+  } catch (e) {
+    console.log("Error", e);
+    res.status(400).json({
+      error_code: "get_my_courses",
+      message: e.message,
+    });
+  }
 };

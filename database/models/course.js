@@ -1,74 +1,105 @@
-import { Model, DataTypes } from "sequelize";
-import connection from "../connection";
+import mongoose from "mongoose";
+const { Schema } = mongoose;
 
-const initCourse = (sequelize, Types) => {
-	class Course extends Model {
-		/**
-		 * Helper method for defining associations.
-		 * This method is not a part of Sequelize lifecycle.
-		 * The `models/index` file will call this method automatically.
-		 */
-		static associate(models) {
-			// define association here
-		}
-	}
-	Course.init(
-		{
-			id: {
-				type: Types.UUID,
-				defaultValue: Types.UUIDV4,
-				primaryKey: true,
-			},
-			title: DataTypes.STRING,
-			slug: DataTypes.STRING,
-			short_desc: DataTypes.TEXT,
-			overview: DataTypes.TEXT,
-			latest_price: DataTypes.FLOAT,
-			before_price: DataTypes.FLOAT,
-			lessons: DataTypes.STRING,
-			duration: DataTypes.STRING,
-			image: DataTypes.STRING,
-			access_time: {
-				type: DataTypes.ENUM,
-				values: ["Lifetime", "Three Months", "Six Months", "1 Year"],
-				defaultValue: "Lifetime",
-			},
-			requirements: DataTypes.TEXT,
-			what_you_will_learn: DataTypes.TEXT,
-			who_is_this_course_for: DataTypes.TEXT,
-			userId: {
-				type: DataTypes.UUID,
-				allowNull: false,
-				onDelete: "CASCADE",
-				references: {
-					model: "users",
-					key: "id",
-					as: "userId",
-				},
-			},
-			catId: {
-				type: DataTypes.UUID,
-				allowNull: false,
-				onDelete: "CASCADE",
-				references: {
-					model: "categories",
-					key: "id",
-					as: "catId",
-				},
-			},
-			approved: DataTypes.BOOLEAN,
-			in_home_page: DataTypes.BOOLEAN,
-			in_home_page_set_at: DataTypes.DATE,
-			is_class: DataTypes.BOOLEAN,
-		},
-		{
-			sequelize,
-			modelName: "Course",
-			tableName: "courses",
-			createdAt: "created_at",
-			updatedAt: "updated_at",
-		}
-	);
-	return Course;
-};
-export default initCourse(connection, DataTypes);
+if (!mongoose.models.Course) {
+  const CourseSchema = new Schema(
+    {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        index: true,
+        required: true,
+        auto: true,
+        alias: "_id",
+      },
+      title: {
+        type: String,
+        required: true,
+      },
+      slug: {
+        type: String,
+        required: true,
+      },
+      short_desc: {
+        type: String,
+        required: true,
+      },
+      overview: {
+        type: String,
+        required: true,
+      },
+      latest_price: {
+        type: Number,
+        required: true,
+      },
+      before_price: {
+        type: Number,
+        required: true,
+      },
+      lessons: {
+        type: String,
+        required: true,
+      },
+      duration: {
+        type: String,
+        required: true,
+      },
+      image: {
+        type: String,
+        required: true,
+      },
+      access_time: {
+        type: String,
+        enum: ["Lifetime", "Three Months", "Six Months", "1 Year"],
+        default: "Lifetime",
+      },
+      requirements: {
+        type: String,
+        required: true,
+      },
+      what_you_will_learn: {
+        type: String,
+        required: true,
+      },
+      who_is_this_course_for: {
+        type: String,
+        required: true,
+      },
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      categoryId: {
+        type: Schema.Types.ObjectId,
+        ref: "Category",
+        required: true,
+      },
+      approved: {
+        type: Boolean,
+        required: true,
+      },
+      in_home_page: {
+        type: Boolean,
+        required: true,
+      },
+      in_home_page_set_at: {
+        type: Date,
+        required: false,
+      },
+      is_class: {
+        type: Boolean,
+        required: true,
+      },
+    },
+    {
+      timestamps: {
+        createdAt: "created_at",
+        updatedAt: "updated_at",
+      },
+    }
+  );
+
+  let Course = mongoose.model("Course", CourseSchema);
+}
+let Course = mongoose.model("Course");
+export default Course;

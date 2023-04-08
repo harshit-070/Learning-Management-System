@@ -1,13 +1,7 @@
-import nodemailer from "nodemailer";
+import AWS from "aws-sdk";
 
-export const transport = nodemailer.createTransport({
-	// Yes. SMTP!
-	service: "SMTP",
-	host: "email-smtp.ap-southeast-1.amazonaws.com", // Amazon email SMTP hostname
-	secureConnection: true, // use SSL
-	port: 465, // port for secure SMTP
-	auth: {
-		user: process.env.AWS_SES_USER, // Use from Amazon Credentials
-		pass: process.env.AWS_SES_PASSWORD, // Use from Amazon Credentials
-	},
+export const ses = new AWS.SES({
+  accessKeyId: process.env.EMAIL_ACCESS_KEY,
+  secretAccessKey: process.env.EMAIL_SECRET_KEY,
+  region: process.env.EMAIL_REGION,
 });

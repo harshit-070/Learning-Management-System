@@ -1,13 +1,27 @@
-import Sequelize from "sequelize";
-import config from "./config/config.mjs";
+import mongoose from "mongoose";
 
-let sequelize;
-if (process.env.NODE_ENV === "production") {
-	sequelize = new Sequelize(config.production);
-} else {
-	sequelize = new Sequelize(config.development);
+const connection = {};
+
+async function connect() {
+  if (connection.isConnected) {
+    return;
+  }
+
+  try {
+    const db = await mongoose.connect("mongodb://localhost:27017/test_1");
+    connection.isConnected = db.connections[0].readyState;
+    console.log("MongoDB Connected");
+  } catch (error) {
+    console.log("MongoDB Connection Error:", error);
+  }
 }
 
-const connection = sequelize;
+async function disconnect() {
+  if (connection.isConnected) {
+    await mongoose.disconnect();
+    connection.isConnected = false;
+    console.log("MongoDB Disconnected");
+  }
+}
 
-export default connection;
+export default { connect, disconnect };

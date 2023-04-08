@@ -1,20 +1,28 @@
 import baseUrl from "@/utils/baseUrl";
-import { transport } from "./config";
+import { ses, transport } from "./config";
 
 export const contactFormEmail = async (
-	name,
-	email,
-	phone,
-	subject,
-	message
+  name,
+  email,
+  phone,
+  subject,
+  message
 ) => {
-	// console.log(user.email)
-	const data = {
-		to: "shabbir@hibootstrap.com",
-		from: "Edmy Online Courses <hello@hibootstrap.com>",
-		subject: "Contact Message",
-		html: `
-        <!DOCTYPE html>
+  // console.log(user.email)
+  const data = {
+    Source: process.env.AWS_FROM_EMAIL,
+    Destination: {
+      ToAddresses: [email],
+    },
+    Message: {
+      Subject: {
+        Charset: "UTF-8",
+        Data: "Contact Message",
+      },
+      Body: {
+        Html: {
+          Charset: "UTF-8",
+          Data: `<!DOCTYPE html>
         <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
         <head>
             <meta charset="utf-8"> <!-- utf-8 works for most cases -->
@@ -363,15 +371,18 @@ export const contactFormEmail = async (
         </body>
         </html>
         `,
-	};
+        },
+      },
+    },
+  };
 
-	try {
-		await transport.sendMail(data);
-		console.log("Email send successfully");
-		// res.status(200).send("Email send successfully")
-	} catch (error) {
-		console.log("########", error);
-		// res.status(500).send("Error proccessing charge");
-	}
-	transport.close();
+  try {
+    await ses.sendEmail(data).promise();
+    console.log("Email send successfully");
+    // res.status(200).send("Email send successfully")
+  } catch (error) {
+    console.log("########", error);
+    // res.status(500).send("Error proccessing charge");
+  }
+  transport.close();
 };
