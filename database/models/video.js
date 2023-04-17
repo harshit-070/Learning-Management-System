@@ -29,7 +29,7 @@ if (!mongoose.models.Video) {
     }
   );
 
-  Video = mongoose.model("Video", videoSchema);
+  let Video = mongoose.model("Video", videoSchema);
 }
 let Video = mongoose.model("Video");
 export default Video;

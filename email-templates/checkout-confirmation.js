@@ -411,5 +411,4 @@ export const checkoutConfirmation = async (cartItems, name, email) => {
     console.log("########", error);
     // res.status(500).send("Error proccessing charge");
   }
-  transport.close();
 };

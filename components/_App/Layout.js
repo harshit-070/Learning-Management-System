@@ -9,63 +9,56 @@ import axios from "axios";
 import baseUrl from "@/utils/baseUrl";
 
 const Layout = ({ children }) => {
-	const [modalOpen, setModalOpen] = useState();
-	const [modalImage, setModalImage] = useState("");
+  const [modalOpen, setModalOpen] = useState();
+  const [modalImage, setModalImage] = useState("");
 
-	useEffect(() => {
-		const fetchSetting = async () => {
-			const resp = await axios.get(`${baseUrl}/settings.json`);
-			setModalOpen(resp.data.siteModal);
-			setModalImage(resp.data.siteModalImage);
-			if (resp.data.siteModal) {
-				document.body.style.overflow = "hidden";
-			}
-		};
-		fetchSetting();
-	}, []);
+  useEffect(() => {
+    const fetchSetting = async () => {
+      const resp = await axios.get(`${baseUrl}/settings.json`);
+      setModalOpen(resp.data.siteModal);
+      setModalImage(resp.data.siteModalImage);
+      if (resp.data.siteModal) {
+        document.body.style.overflow = "hidden";
+      }
+    };
+    fetchSetting();
+  }, []);
 
-	const close = () => {
-		setModalOpen(false);
-		document.body.style.overflow = "unset";
-	};
+  const close = () => {
+    setModalOpen(false);
+    document.body.style.overflow = "unset";
+  };
 
-	return (
-		<>
-			<Head>
-				<title>Edmy - LMS & Education System with React + Nextjs</title>
-				<meta
-					name="viewport"
-					content="initial-scale=1.0, width=device-width"
-				/>
-				<link
-					rel="icon"
-					href="https://res.cloudinary.com/dev-empty/image/upload/v1662278490/edmy/favicon.png"
-				/>
-			</Head>
+  return (
+    <>
+      <Head>
+        <title>Edmy - LMS & Education System with React + Nextjs</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link
+          rel="icon"
+          href="https://res.cloudinary.com/dev-empty/image/upload/v1662278490/edmy/favicon.png"
+        />
+      </Head>
 
-			{children}
+      {children}
 
-			<Script src="https://meet.jit.si/external_api.js" />
+      <Script src="https://meet.jit.si/external_api.js" />
 
-			<Toaster />
+      <Toaster />
 
-			<GoTop />
+      <GoTop />
 
-			<AnimatePresence
-				initial={false}
-				onExitComplete={() => null}
-				mode="wait"
-			>
-				{modalOpen && modalImage && (
-					<Modal
-						modalOpen={modalOpen}
-						handleClose={close}
-						image_url={modalImage}
-					/>
-				)}
-			</AnimatePresence>
-		</>
-	);
+      <AnimatePresence initial={false} onExitComplete={() => null} mode="wait">
+        {modalOpen && modalImage && (
+          <Modal
+            modalOpen={modalOpen}
+            handleClose={close}
+            image_url={modalImage}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  );
 };
 
 export default Layout;

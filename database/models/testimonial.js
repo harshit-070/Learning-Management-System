@@ -20,7 +20,7 @@ if (!mongoose.models.Testimonial) {
     }
   );
 
-  Testimonial = mongoose.model("Testimonial", testimonialSchema);
+  let Testimonial = mongoose.model("Testimonial", testimonialSchema);
 }
 let Testimonial = mongoose.model("Testimonial");
 export default Testimonial;

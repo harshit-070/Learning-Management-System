@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { slugify } from "@/utils/auth";
 import Course from "database/models/course";
+import { getUploadSignedUrl } from "../s3";
 
 export default async function handler(req, res) {
   if (!("authorization" in req.headers)) {
@@ -71,10 +72,16 @@ const handlePostRequest = async (req, res) => {
       is_class: is_class && true,
     });
 
+    let signedUrl;
+    if (image) {
+      signedUrl = await getUploadSignedUrl(newcourse._id, 60);
+    }
+
     res.status(200).json({
       message:
         "Course created successfully. Please wait until approved by an admin.",
       course: newcourse,
+      signedUrl,
     });
   } catch (e) {
     res.status(400).json({

@@ -24,7 +24,6 @@ const handleGet = async (req, res) => {
       instructor_request: true,
       instructor_request_confirmed: false,
     });
-
     res.status(200).json({ instructors });
   } catch (e) {
     res.status(400).json({

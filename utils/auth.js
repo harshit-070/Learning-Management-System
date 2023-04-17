@@ -1,9 +1,10 @@
-import cookie from "js-cookie";
+import Cookies from "js-cookie";
 import Router from "next/router";
 
 export const handleLogin = async (t, routeNext) => {
   console.log(t);
-  await cookie.set("edmy_users_token", t);
+  const response = Cookies.set("edmy_users_token", t);
+  console.log(response);
   if (routeNext.query && routeNext.query.next) {
     Router.push(routeNext.query.next);
   } else {
@@ -12,12 +13,12 @@ export const handleLogin = async (t, routeNext) => {
 };
 
 export const handleLogout = () => {
-  cookie.remove("edmy_users_token");
+  Cookies.remove("edmy_users_token");
   Router.push("/");
 };
 
 export const destroyCookie = () => {
-  cookie.remove("edmy_users_token");
+  Cookies.remove("edmy_users_token");
   Router.reload("/");
 };
 
