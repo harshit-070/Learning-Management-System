@@ -3,13 +3,6 @@ import mongoose from "mongoose";
 if (!mongoose.models.Instructor_Earning) {
   const instructorEarningSchema = new mongoose.Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       earnings: {
         type: Number,
         required: true,
@@ -30,8 +23,16 @@ if (!mongoose.models.Instructor_Earning) {
         default: "due",
       },
     },
-    { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+    {
+      timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
+    }
   );
+
+  instructorEarningSchema.virtual("id", function () {
+    return this._id;
+  });
 
   let Instructor_Earning = mongoose.model(
     "Instructor_Earning",

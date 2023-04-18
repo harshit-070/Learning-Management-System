@@ -68,7 +68,7 @@ const updateTestimonial = async (req, res) => {
     const { testId, image_url, name, designation, description } = req.body;
 
     await Testimonial.updateOne(
-      { id: testId },
+      { _id: testId },
       {
         image_url,
         name,

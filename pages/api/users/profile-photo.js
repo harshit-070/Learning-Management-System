@@ -25,7 +25,7 @@ const userProfilePhoto = async (req, res) => {
     );
 
     await User.update(
-      { id: userId },
+      { _id: userId },
       {
         profile_photo,
       }

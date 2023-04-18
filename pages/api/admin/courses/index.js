@@ -20,21 +20,24 @@ export default async function handler(req, res) {
 
 const handleGet = async (req, res) => {
   try {
-    const courses = await Course.find({ approved: true })
+    let courses = await Course.find({ approved: true })
       .sort({ created_at: -1 })
       .populate({
-        path: "user",
+        path: "userId",
         select: "first_name last_name profile_photo",
       })
       .populate({
-        path: "category",
+        path: "catId",
         select: "name slug",
-      })
-      .populate({
-        path: "videos",
-        select: "title",
       });
-
+    courses = JSON.parse(JSON.stringify(courses));
+    for (let i = 0; i < courses.length; i++) {
+      const video = await Video.find({ courseId: courses[i]._id })
+        .lean(true)
+        .select({ title: 1 });
+      courses[i].videos = video;
+      console.log(courses[i]);
+    }
     res.status(200).json({ courses });
   } catch (e) {
     res.status(400).json({

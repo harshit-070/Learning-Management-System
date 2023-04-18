@@ -26,9 +26,14 @@ if (!mongoose.models.Video) {
         createdAt: "created_at",
         updatedAt: "updated_at",
       },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
 
+  videoSchema.virtual("id", function () {
+    return this._id;
+  });
   let Video = mongoose.model("Video", videoSchema);
 }
 let Video = mongoose.model("Video");

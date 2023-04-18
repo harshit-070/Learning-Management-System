@@ -52,24 +52,23 @@ const handlePostRequest = async (req, res) => {
     if (slugExist) {
       slug = `${slug}-${Math.floor(Math.random() * (999 - 100 + 1) + 100)}`;
     }
-
     const newcourse = await Course.create({
       title,
       slug,
       short_desc,
-      overview,
+      // overview,
       latest_price,
       before_price,
       lessons,
       duration,
-      image,
+      // image,
       access_time,
-      requirements,
-      what_you_will_learn,
-      who_is_this_course_for,
+      // requirements,
+      // what_you_will_learn,
+      // who_is_this_course_for,
       userId,
       catId,
-      is_class: is_class && true,
+      is_class: Boolean(is_class && true),
     });
 
     let signedUrl;

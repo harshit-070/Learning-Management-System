@@ -124,17 +124,17 @@ const CourseUpdateForm = ({ courseData }) => {
 	};
 
 	const handleImageUpload = async () => {
-		const data = new FormData();
-		data.append("file", course.image);
-		data.append("upload_preset", process.env.UPLOAD_PRESETS);
-		data.append("cloud_name", process.env.CLOUD_NAME);
-		let response;
-		if (course.image) {
-			response = await axios.post(process.env.CLOUDINARY_URL, data);
-		}
-		const imageUrl = response.data.url;
+		// const data = new FormData();
+		// data.append("file", course.image);
+		// data.append("upload_preset", process.env.UPLOAD_PRESETS);
+		// data.append("cloud_name", process.env.CLOUD_NAME);
+		// let response;
+		// if (course.image) {
+		// 	response = await axios.post(process.env.CLOUDINARY_URL, data);
+		// }
+		// const imageUrl = response.data.url;
 
-		return imageUrl;
+		return "imageUrl";
 	};
 
 	const handleSubmit = async (e) => {

@@ -3,13 +3,6 @@ import mongoose from "mongoose";
 if (!mongoose.models.Subscription) {
   const subscriptionSchema = new mongoose.Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       email: {
         type: String,
         required: true,
@@ -25,8 +18,14 @@ if (!mongoose.models.Subscription) {
         createdAt: "created_at",
         updatedAt: "updated_at",
       },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
+
+  subscriptionSchema.virtual("id", function () {
+    return this._id;
+  });
   let Subscription = mongoose.model("Subscription", subscriptionSchema);
 }
 let Subscription = mongoose.model("Subscription");

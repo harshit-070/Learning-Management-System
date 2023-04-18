@@ -26,19 +26,21 @@ const handleGetRequest = async (req, res) => {
     const courses = await Course.find({ userId })
       .sort({ created_at: -1 })
       .populate({
-        path: "user",
+        path: "userId",
         select: "first_name last_name profile_photo",
+        strictPopulate: false,
       })
       .populate({
         path: "enrolments",
         select: "_id",
-      })
-      .exec();
-
+        strictPopulate: false,
+      });
+    console.log(courses);
     res.status(200).json({
       courses,
     });
   } catch (e) {
+    console.log(e);
     res.status(400).json({
       error_code: "get_my_courses",
       message: e.message,

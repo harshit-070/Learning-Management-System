@@ -61,12 +61,12 @@ const userSignin = async (req, res) => {
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
       );
-      res.status(200).json({
+      return res.status(200).json({
         message: "Login Successful!",
         edmy_users_token,
       });
     } else {
-      res.status(401).json({ message: "Password is not correct" });
+      return res.status(401).json({ message: "Password is not correct" });
     }
   } catch (e) {
     // console.error(error)

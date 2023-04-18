@@ -39,7 +39,7 @@ const userEmailConfirm = async (req, res) => {
     }
 
     await User.updateOne(
-      { id: user.id },
+      { _id: user.id },
       {
         email_confirmed: true,
         email_confirmed_at: Date.now(),

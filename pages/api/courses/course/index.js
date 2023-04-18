@@ -23,21 +23,21 @@ const handleGetRequest = async (req, res) => {
   try {
     const course = await Course.findOne({ slug: slug })
       .populate({
-        path: "user",
+        path: "userId",
         select: "first_name last_name profile_photo bio",
       })
       .populate({
-        path: "category",
+        path: "catId",
         select: "name slug",
-      })
-      .populate({
-        path: "enrolments",
-        select: "_id",
-      })
-      .populate({
-        path: "assets",
-        select: "_id",
       });
+    // .populate({
+    //   path: "enrolments",
+    //   select: "_id",
+    // })
+    // .populate({
+    //   path: "assets",
+    //   select: "_id",
+    // });
 
     res.status(200).json({
       course,

@@ -31,7 +31,7 @@ const handlePut = async (req, res) => {
       id: userId,
       instructor_request: true,
     });
-
+    console.log("User :", userId);
     const admins = await User.find({
       role: "admin",
     });

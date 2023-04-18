@@ -3,13 +3,6 @@ import mongoose from "mongoose";
 if (!mongoose.models.User) {
   const userSchema = new mongoose.Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       first_name: { type: String },
       last_name: { type: String },
       email: { type: String },
@@ -44,8 +37,17 @@ if (!mongoose.models.User) {
       status: { type: Boolean, default: false },
       is_profile_public: { type: Boolean },
     },
-    { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+    {
+      timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
+    }
   );
+
+  userSchema.virtual("id", function () {
+    console.log(this);
+    return this._id;
+  });
 
   let User = mongoose.model("User", userSchema);
 }

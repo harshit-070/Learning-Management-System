@@ -3,13 +3,6 @@ import mongoose from "mongoose";
 if (!mongoose.models.Testimonial) {
   const testimonialSchema = new mongoose.Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       image_url: { type: String, required: true },
       name: { type: String, required: true },
       designation: { type: String, required: true },
@@ -17,8 +10,14 @@ if (!mongoose.models.Testimonial) {
     },
     {
       timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
+
+  testimonialSchema.virtual("id", function () {
+    return this._id;
+  });
 
   let Testimonial = mongoose.model("Testimonial", testimonialSchema);
 }

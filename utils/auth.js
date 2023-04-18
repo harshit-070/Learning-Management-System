@@ -3,8 +3,23 @@ import Router from "next/router";
 
 export const handleLogin = async (t, routeNext) => {
   console.log(t);
-  const response = Cookies.set("edmy_users_token", t);
-  console.log(response);
+  try {
+    const expirationDate = new Date(
+      new Date().getTime() + 7 * 24 * 60 * 60 * 1000
+    ); // set the expiration to 7 days from now
+    const response = Cookies.set("edmy_users_token", t, {
+      domain: "localhost",
+      path: "/",
+      sameSite: "None",
+      secure: false,
+      expires: expirationDate,
+    });
+
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+
   if (routeNext.query && routeNext.query.next) {
     Router.push(routeNext.query.next);
   } else {

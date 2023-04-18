@@ -7,8 +7,10 @@ async function connect() {
     return;
   }
 
+  console.log("Connecting with mongodb");
+
   try {
-    const db = await mongoose.connect("mongodb://localhost:27017/test_1");
+    const db = await mongoose.connect("mongodb://localhost:27017/test_test");
     connection.isConnected = db.connections[0].readyState;
     console.log("MongoDB Connected");
   } catch (error) {

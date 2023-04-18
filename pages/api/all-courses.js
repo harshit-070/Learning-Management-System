@@ -34,8 +34,8 @@ const handleGetRequest = async (req, res) => {
       ],
     })
       .sort(short ? { latest_price: short } : { created_at: -1 })
-      .populate("user", "first_name last_name profile_photo")
-      .populate("enrolments", "_id")
+      .populate("userId", "first_name last_name profile_photo")
+      // .populate("enrolments", "_id")
       .skip(coursesOffset)
       .limit(LIMIT);
 

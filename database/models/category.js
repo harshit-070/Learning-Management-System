@@ -3,13 +3,6 @@ import mongoose from "mongoose";
 if (!mongoose.models.Category) {
   const categorySchema = new mongoose.Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       name: {
         type: String,
         required: true,
@@ -22,8 +15,14 @@ if (!mongoose.models.Category) {
     },
     {
       timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
+  categorySchema.virtual("id", function () {
+    console.log(this);
+    return this._id;
+  });
 
   let Category = mongoose.model("Category", categorySchema);
 }
