@@ -36,47 +36,17 @@ const s3Client = new S3({
   secretAccessKey: process.env.AWS_S3_SECRET_KEY,
 });
 
-export const getUploadSignedUrl = async (key, duration) => {
+export const getUploadSignedUrl = async (
+  key,
+  ContentType = "application/octet-stream"
+) => {
   const params = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: key,
-    ContentType: "application/octet-stream",
+    ContentType,
     ACL: "private",
-    Expires: duration,
-    HttpMethod: "PUT",
+    Expires: 3 * 60, // 3 minutes
   };
   const signedUrl = s3Client.getSignedUrl("putObject", params);
   return signedUrl;
-};
-
-export const uploadToS3 = async (file, fileName) => {
-  const fileStream = fs.createReadStream(file.path);
-
-  try {
-    return s3Client
-      .upload({
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
-        Key: fileName, // Change this to your desired file name and extension
-        Body: fileStream,
-        ACL: "public-read",
-      })
-      .promise();
-  } catch (error) {
-    log.error(error);
-    throw new ErrorHandler("Error while uploading the file in S3", 500);
-  }
-};
-
-export const deleteFromS3 = async (path) => {
-  try {
-    await s3Client
-      .deleteObject({
-        Bucket: config.get("AWS.BUCKET.NAME"),
-        Key: path,
-      })
-      .promise();
-  } catch (error) {
-    log.error(error);
-    throw new ErrorHandler("Error while deleting the file in S3", 500);
-  }
 };

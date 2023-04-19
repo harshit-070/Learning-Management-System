@@ -13,7 +13,6 @@ const PageNavigation = ({ courseId, activeClassname }) => {
       const payload = {
         headers: { Authorization: edmy_users_token },
       };
-      console.log(courseId);
       const url = `${baseUrl}/api/courses/course/${courseId}`;
       const response = await axios.get(url, payload);
       setCourse({ title: response.data.course.title });

@@ -45,19 +45,21 @@ const Photo = ({ user }) => {
     setProfilePreview(window.URL.createObjectURL(files[0]));
   };
 
-  const handleProfilePhotoUpload = async () => {
-    // console.log(avatar);
-    // const data = new FormData();
-    // data.append("file", avatar.profile_photo);
-    // data.append("upload_preset", process.env.UPLOAD_PRESETS);
-    // data.append("cloud_name", process.env.CLOUD_NAME);
+  const getImageType = () => {
+    if (avatar.profile_photo) {
+      const fileExtension = avatar.profile_photo.name.split(".").pop();
+      return `image/${fileExtension}`;
+    }
+  };
 
-    // let response;
-    // if (avatar) {
-    // 	response = await axios.post(process.env.CLOUDINARY_URL, data);
-    // }
-    // const profilePhotoUrl = response.data.url;
-    return "profilePhotoUrl";
+  const handleImageUpload = async (signedUrl) => {
+    const mimeType = getImageType();
+    const response = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": mimeType },
+      body: avatar.profile_photo,
+    });
+    console.log(response);
   };
 
   const handleSubmit = async (e) => {
@@ -65,22 +67,34 @@ const Photo = ({ user }) => {
     try {
       // console.log(avatar);
       let profile = "";
-      if (avatar) {
-        profile = await handleProfilePhotoUpload();
-        profile = profile.replace(/^http:\/\//i, "https://");
-      }
+      // if (avatar) {
+      //   profile = await handleProfilePhotoUpload();
+      //   profile = profile.replace(/^http:\/\//i, "https://");
+      // }
       // console.log(profile);
-      const url = `${baseUrl}/api/users/profile-photo`;
-      const payload = {
-        profile_photo: profile,
-      };
-      const response = await axios.put(url, payload, {
+      const url = `${baseUrl}/api/users/profile-photo?image_type=${getImageType()}`;
+
+      const r = await axios.get(url, {
         headers: { Authorization: edmy_users_token },
       });
+
+      await handleImageUpload(r.data.signedUrl);
+
+      const image_update = `${baseUrl}/api/users/profile-photo`;
+
+      const response = await axios.put(
+        image_update,
+        {},
+        {
+          headers: { Authorization: edmy_users_token },
+        }
+      );
+
       setLoading(false);
       toast.success(response.data.message);
       router.push("/");
     } catch (err) {
+      console.log(err);
       let {
         response: {
           data: { message },

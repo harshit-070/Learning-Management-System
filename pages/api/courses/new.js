@@ -37,6 +37,7 @@ const handlePostRequest = async (req, res) => {
     who_is_this_course_for,
     catId,
     is_class,
+    image_type,
   } = req.body;
   try {
     const { userId } = jwt.verify(
@@ -73,7 +74,10 @@ const handlePostRequest = async (req, res) => {
 
     let signedUrl;
     if (image) {
-      signedUrl = await getUploadSignedUrl(newcourse._id, 60);
+      const key = `course/${newcourse._id}`;
+      signedUrl = await getUploadSignedUrl(key, image_type);
+      newcourse.image = `${key}`;
+      await newcourse.save();
     }
 
     res.status(200).json({
@@ -83,6 +87,7 @@ const handlePostRequest = async (req, res) => {
       signedUrl,
     });
   } catch (e) {
+    console.log(e);
     res.status(400).json({
       error_code: "create_course",
       message: e.message,

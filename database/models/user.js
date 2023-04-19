@@ -10,7 +10,7 @@ if (!mongoose.models.User) {
       gender: { type: String },
       designation: { type: String },
       bio: { type: String },
-      profile_photo: { type: String },
+      profile: { type: String },
       location: { type: String },
       phone: { type: String },
       reset_password_token: { type: String },
@@ -45,8 +45,11 @@ if (!mongoose.models.User) {
   );
 
   userSchema.virtual("id", function () {
-    console.log(this);
     return this._id;
+  });
+
+  userSchema.virtual("profile_photo").get(function () {
+    return `${process.env.CLOUDFRONT_URL}/${this.profile}`;
   });
 
   let User = mongoose.model("User", userSchema);

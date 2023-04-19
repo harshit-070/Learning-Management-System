@@ -57,7 +57,6 @@ const handleGetRequest = async (req, res) => {
         },
       },
     ]);
-    console.log(courses);
 
     const categories = await Category.aggregate([{ $sample: { size: 12 } }]);
     res.status(200).json({

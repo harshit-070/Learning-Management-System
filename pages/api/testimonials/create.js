@@ -1,5 +1,6 @@
 import { slugify } from "@/utils/auth";
 import Testimonial from "database/models/testimonial";
+import { getUploadSignedUrl } from "../s3";
 
 export default async function handler(req, res) {
   if (!("authorization" in req.headers)) {
@@ -27,7 +28,6 @@ export default async function handler(req, res) {
 
 const testimonialById = async (req, res) => {
   const { testId } = req.query;
-  // console.log("####", catId);
   try {
     const testimonial = await Testimonial.findById(testId);
 
@@ -41,19 +41,27 @@ const testimonialById = async (req, res) => {
 };
 
 const createTestimonial = async (req, res) => {
-  const { image_url, name, designation, description } = req.body;
+  const { image, image_type, name, designation, description } = req.body;
 
   try {
     const newcreateTestimonial = await Testimonial.create({
-      image_url,
       name,
       designation,
       description,
     });
 
+    let signedUrl;
+    if (image) {
+      const key = `testimonial/${newcreateTestimonial._id}`;
+      signedUrl = await getUploadSignedUrl(key, image_type);
+      newcreateTestimonial.image = key;
+      await newcreateTestimonial.save();
+    }
+
     res.status(200).json({
       message: "New Testimonial added",
       testimonial: newcreateTestimonial,
+      signedUrl,
     });
   } catch (e) {
     res.status(400).json({
@@ -65,20 +73,25 @@ const createTestimonial = async (req, res) => {
 
 const updateTestimonial = async (req, res) => {
   try {
-    const { testId, image_url, name, designation, description } = req.body;
+    const { testId, image, image_type, name, designation, description } =
+      req.body;
 
     await Testimonial.updateOne(
       { _id: testId },
       {
-        image_url,
         name,
         designation,
         description,
       }
     );
-
+    let signedUrl;
+    if (image) {
+      const key = `testimonial/${testId._id}`;
+      signedUrl = await getUploadSignedUrl(key, image_type);
+    }
     res.status(200).json({
       message: "Testimonial updated.",
+      signedUrl,
     });
   } catch (e) {
     res.status(400).json({
@@ -92,11 +105,7 @@ const handleDelete = async (req, res) => {
   const { testId } = req.query;
   // console.log(testId);
   try {
-    const testi = await Testimonial.findOne({
-      id: testId,
-    });
-
-    testi.destroy();
+    const testi = await Testimonial.findByIdAndDelete(testId);
 
     res.status(200).json({ message: "Testimonial deleted successfully." });
   } catch (e) {

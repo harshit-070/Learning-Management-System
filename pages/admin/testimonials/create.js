@@ -63,35 +63,32 @@ const Index = ({ user }) => {
     }
   };
 
-  const handleImageUpload = async () => {
-    // const data = new FormData();
-    // data.append("file", testimonial.image_url);
-    // data.append("upload_preset", process.env.UPLOAD_PRESETS);
-    // data.append("cloud_name", process.env.CLOUD_NAME);
-    // let response;
-    // if (testimonial.image_url) {
-    // 	response = await axios.post(process.env.CLOUDINARY_URL, data);
-    // }
-    // const imageUrl = response.data.url;
+  const getImageType = () => {
+    if (testimonial.image_url) {
+      const fileExtension = testimonial.image_url.name.split(".").pop();
+      return `image/${fileExtension}`;
+    }
+  };
 
-    return "imageUrl";
+  const handleImageUpload = async (signedUrl) => {
+    const mimeType = getImageType();
+    const response = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": mimeType },
+      body: testimonial.image_url,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      let photo;
-      if (testimonial.image_url) {
-        photo = await handleImageUpload();
-
-        photo = photo.replace(/^http:\/\//i, "https://");
-      }
 
       const url = `${baseUrl}/api/testimonials/create`;
       const { name, designation, description } = testimonial;
       const payload = {
-        image_url: photo,
+        image: testimonial.image_url ? true : false,
+        image_type: getImageType(),
         name,
         designation,
         description,
@@ -101,6 +98,10 @@ const Index = ({ user }) => {
         headers: { Authorization: edmy_users_token },
       });
       setLoading(false);
+
+      if (testimonial.image_url) {
+        await handleImageUpload(response.data.signedUrl);
+      }
 
       toast.success(response.data.message, {
         style: {
@@ -115,6 +116,7 @@ const Index = ({ user }) => {
       });
       router.push("/admin/testimonials");
     } catch (err) {
+      console.log(err);
       let {
         response: {
           data: { message },

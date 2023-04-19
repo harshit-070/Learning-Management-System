@@ -75,7 +75,7 @@ const Index = ({ user }) => {
       }
       setTestimonial((prevState) => ({
         ...prevState,
-        image_url: files[0],
+        new_image_url: files[0],
       }));
       setImagePreview(window.URL.createObjectURL(files[0]));
     } else {
@@ -83,18 +83,20 @@ const Index = ({ user }) => {
     }
   };
 
-  const handleImageUpload = async () => {
-    // const data = new FormData();
-    // data.append("file", testimonial.image_url);
-    // data.append("upload_preset", process.env.UPLOAD_PRESETS);
-    // data.append("cloud_name", process.env.CLOUD_NAME);
-    // let response;
-    // if (testimonial.image_url) {
-    // 	response = await axios.post(process.env.CLOUDINARY_URL, data);
-    // }
-    // const imageUrl = response.data.url;
+  const getImageType = () => {
+    if (testimonial.new_image_url) {
+      const fileExtension = testimonial.new_image_url?.name.split(".").pop();
+      return `image/${fileExtension}`;
+    }
+  };
 
-    return "imageUrl";
+  const handleImageUpload = async (signedUrl) => {
+    const mimeType = getImageType();
+    const response = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": mimeType },
+      body: testimonial.new_image_url,
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -102,17 +104,13 @@ const Index = ({ user }) => {
     try {
       setLoading(true);
       let photo;
-      if (testimonial.image_url) {
-        photo = await handleImageUpload();
-
-        photo = photo.replace(/^http:\/\//i, "https://");
-      }
 
       const url = `${baseUrl}/api/testimonials/create`;
       const { name, designation, description } = testimonial;
       const payload = {
         testId: id,
-        image_url: photo,
+        image: testimonial.new_image_url ? true : false,
+        image_type: getImageType(),
         name,
         designation,
         description,
@@ -121,6 +119,10 @@ const Index = ({ user }) => {
       const response = await axios.put(url, payload, {
         headers: { Authorization: edmy_users_token },
       });
+      if (testimonial.new_image_url) {
+        await handleImageUpload(response.data.signedUrl);
+      }
+
       setLoading(false);
 
       toast.success(response.data.message, {
@@ -136,6 +138,7 @@ const Index = ({ user }) => {
       });
       router.push("/admin/testimonials");
     } catch (err) {
+      console.log(err);
       let {
         response: {
           data: { message },
@@ -269,7 +272,7 @@ const Index = ({ user }) => {
                     <div className="col-12">
                       <Button
                         loading={loading}
-                        disabled={disabled}
+                        disabled={false}
                         btnText="Update"
                         btnClass="default-btn"
                       />

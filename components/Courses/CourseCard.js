@@ -60,7 +60,10 @@ const CourseCard = ({ course, onFav, onUnFav, userId, onAddCart }) => {
     <div className="col-lg-3 col-md-6">
       <div className="single-courses">
         <div className="courses-main-img">
-          <img src={image} alt="Image" />
+          <img
+            src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${image}`}
+            alt="Course"
+          />
         </div>
         <div className="courses-content">
           <h3>{title}</h3>

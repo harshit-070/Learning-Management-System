@@ -35,7 +35,6 @@ const handleGetRequest = async (req, res) => {
         select: "_id",
         strictPopulate: false,
       });
-    console.log(courses);
     res.status(200).json({
       courses,
     });

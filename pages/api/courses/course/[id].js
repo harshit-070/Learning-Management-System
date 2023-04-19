@@ -25,7 +25,7 @@ const handleGet = async (req, res) => {
   const { id } = req.query;
   try {
     const course = await Course.findById(id);
-    console.log(course);
+
     res.status(200).json({ course });
   } catch (e) {
     res.status(400).json({

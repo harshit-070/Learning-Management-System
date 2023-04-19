@@ -30,7 +30,6 @@ const handleGet = async (req, res) => {
         .lean(true)
         .select({ title: 1 });
       courses[i].videos = video;
-      console.log(courses[i]);
     }
     res.status(200).json({ courses });
   } catch (e) {

@@ -87,8 +87,15 @@ const CourseCreateForm = ({ btnText, is_class }) => {
     }
   };
 
-  const handleImageUpload = async () => {
-    // const data = new FormData();
+  const getImageType = () => {
+    if (course.image) {
+      const fileExtension = course.image.name.split(".").pop();
+      return `image/${fileExtension}`;
+    }
+  };
+
+  const handleImageUpload = async (signedUrl) => {
+    const data = new FormData();
     // data.append("file", course.image);
     // data.append("upload_preset", process.env.UPLOAD_PRESETS);
     // data.append("cloud_name", process.env.CLOUD_NAME);
@@ -96,9 +103,13 @@ const CourseCreateForm = ({ btnText, is_class }) => {
     // if (course.image) {
     //   response = await axios.post(process.env.CLOUDINARY_URL, data);
     // }
-    // const imageUrl = response.data.url;
-
-    return "imageUrl";
+    const mimeType = getImageType();
+    const response = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": mimeType },
+      body: course.image,
+    });
+    console.log(response);
   };
 
   const handleSubmit = async (e) => {
@@ -107,10 +118,10 @@ const CourseCreateForm = ({ btnText, is_class }) => {
       setLoading(true);
       let photo;
       if (course.image) {
-        photo = await handleImageUpload();
-
-        photo = photo.replace(/^http:\/\//i, "https://");
+        photo = true;
       }
+
+      const mimeType = getImageType();
 
       const {
         title,
@@ -134,7 +145,8 @@ const CourseCreateForm = ({ btnText, is_class }) => {
         before_price,
         lessons,
         duration,
-        // image: photo,
+        image_type: mimeType,
+        image: photo,
         access_time,
         requirements,
         what_you_will_learn,
@@ -150,6 +162,8 @@ const CourseCreateForm = ({ btnText, is_class }) => {
       const url = `${baseUrl}/api/courses/new`;
       const response = await axios.post(url, payloadData, payloadHeader);
       setLoading(false);
+
+      if (course.image) await handleImageUpload(response.data.signedUrl);
 
       toast.success(response.data.message, {
         style: {

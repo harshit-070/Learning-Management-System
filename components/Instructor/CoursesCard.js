@@ -6,7 +6,7 @@ const CoursesCard = ({
   title,
   slug,
   short_desc,
-  //   image,
+  image,
   latest_price,
   before_price,
   lessons,
@@ -18,12 +18,16 @@ const CoursesCard = ({
   return (
     <div className="col-lg-4 col-md-6">
       <div className="teacher-courses-box">
-        {/* <div className="courses-image">
+        <div className="courses-image">
           {is_class ? (
             <Link href={`/learning/course/class/${slug}`}>
               <a className="d-block image">
                 <img
-                  src={image ? image : "/images/courses/courses1.jpg"}
+                  src={
+                    image
+                      ? `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${image}`
+                      : "/images/courses/courses1.jpg"
+                  }
                   alt="image"
                 />
               </a>
@@ -32,7 +36,11 @@ const CoursesCard = ({
             <Link href={`/course/${slug}`}>
               <a className="d-block image">
                 <img
-                  src={image ? image : "/images/courses/courses1.jpg"}
+                  src={
+                    image
+                      ? `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${image}`
+                      : "/images/courses/courses1.jpg"
+                  }
                   alt="image"
                 />
               </a>
@@ -95,7 +103,7 @@ const CoursesCard = ({
               ${latest_price > 0 ? latest_price : "Free"}
             </div>
           </>
-        </div> */}
+        </div>
         <div className="courses-content">
           <div className="course-author d-flex align-items-center">
             <img
