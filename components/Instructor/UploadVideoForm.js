@@ -5,6 +5,7 @@ import baseUrl from "@/utils/baseUrl";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import Button from "@/utils/Button";
+import * as tus from "tus-js-client";
 
 const INITIAL_VALUE = {
   group_name: "",
@@ -103,47 +104,67 @@ const UploadVideoForm = ({ courseId }) => {
     }
   };
 
-  const handleVideoUpload = async () => {
-    // const data = new FormData();
-    // data.append("file", video.video);
-    // data.append("upload_preset", process.env.UPLOAD_PRESETS);
-    // data.append("cloud_name", process.env.CLOUD_NAME);
-    // let response;
-    // if (video.video) {
-    // 	response = await axios.post(process.env.CLOUDINARY_VIDEO_URL, data);
-    // }
+  const handleVideoUpload = async (headers) => {
+    try {
+      // Create a new tus upload
+      var upload = new tus.Upload(video.video, {
+        endpoint: "https://video.bunnycdn.com/tusupload",
+        retryDelays: [0, 3000, 5000, 10000, 20000, 60000, 60000],
+        headers,
+        metadata: {
+          filename: video.video.name,
+          filetype: video.video.type,
+        },
+        // Callback for errors which cannot be fixed using retries
+        onError: function (error) {
+          console.log("Failed because: " + error);
+        },
+        // Callback for reporting upload progress
+        onProgress: function (bytesUploaded, bytesTotal) {
+          var percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+          console.log(bytesUploaded, bytesTotal, percentage + "%");
+        },
+        // Callback for once the upload is completed
+        onSuccess: function () {
+          console.log("Download %s from %s", upload.file.name, upload.url);
+        },
+      });
 
-    // const mediaUrl = response.data.url;
-    return "mediaUrl";
+      // Check if there are any previous uploads to continue.
+      upload.findPreviousUploads().then(function (previousUploads) {
+        // Found previous uploads so we select the first one.
+        if (previousUploads.length) {
+          upload.resumeFromPreviousUpload(previousUploads[0]);
+        }
+
+        // Start the upload
+        upload.start();
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getImageType = () => {
+    if (video.thumb) {
+      const fileExtension = video.thumb.name.split(".").pop();
+      return `image/${fileExtension}`;
+    }
   };
 
-  const handleThumbUpload = async () => {
-    // const data = new FormData();
-    // data.append("file", video.thumb);
-    // data.append("upload_preset", process.env.UPLOAD_PRESETS);
-    // data.append("cloud_name", process.env.CLOUD_NAME);
-    // let response;
-    // if (video.thumb) {
-    // 	response = await axios.post(process.env.CLOUDINARY_URL, data);
-    // }
-
-    // const imageUrl = response.data.url;
-
-    return imageUrl;
+  const handleThumbUpload = async (signedUrl) => {
+    const mimeType = getImageType();
+    const response = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": mimeType },
+      body: video.thumb,
+    });
+    console.log(response);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      let videoUrl = "";
-      let thumbUrl = "";
-      if (video.video) {
-        const videoUpload = await handleVideoUpload();
-        videoUrl = videoUpload.replace(/^http:\/\//i, "https://");
-        const thumbUpload = await handleThumbUpload();
-        thumbUrl = thumbUpload.replace(/^http:\/\//i, "https://");
-      }
 
       const {
         group_name,
@@ -157,9 +178,9 @@ const UploadVideoForm = ({ courseId }) => {
       const payloadData = {
         group_name,
         title,
-        thumb: thumbUrl,
-        video: videoUrl,
+        thumb: video.thumb ? true : false,
         video_length,
+        image_type: getImageType(),
         is_preview,
         short_id,
         courseId,
@@ -170,6 +191,7 @@ const UploadVideoForm = ({ courseId }) => {
       };
 
       const response = await axios.post(url, payloadData, payloadHeader);
+      await handleVideoUpload(response.data.headers);
 
       toast.success(response.data.message, {
         style: {
@@ -183,9 +205,9 @@ const UploadVideoForm = ({ courseId }) => {
         },
       });
 
-      setLoading(false);
+      // setLoading(false);
 
-      router.push(`/instructor/course/uploads/${courseId}`);
+      // router.push(`/instructor/course/uploads/${courseId}`);
     } catch (err) {
       let {
         response: {

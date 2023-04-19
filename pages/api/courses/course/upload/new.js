@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import Video from "database/models/video";
+import { bunnyStream } from "pages/api/bunny";
+import { getUploadSignedUrl } from "pages/api/s3";
 
 export default async function handler(req, res) {
   if (!("authorization" in req.headers)) {
@@ -28,6 +30,7 @@ const handlePost = async (req, res) => {
     title,
     thumb,
     video,
+    image_type,
     video_length,
     is_preview,
     short_id,
@@ -39,11 +42,12 @@ const handlePost = async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    await Video.create({
+    const response = await bunnyStream.createDirectUpload({ title });
+
+    const newVideo = await Video.create({
       group_name,
       title,
-      thumb,
-      video,
+      video: response.headers.VideoId,
       video_length,
       is_preview,
       short_id,
@@ -51,8 +55,25 @@ const handlePost = async (req, res) => {
       userId,
     });
 
-    res.status(200).json({ message: "Video Uploaded Successfully." });
+    console.log(newVideo);
+
+    let thumbSignedUrl;
+    if (image_type) {
+      console.log(newVideo.thumb);
+      const key = `thumb/${newVideo._id}`;
+      thumbSignedUrl = await getUploadSignedUrl(key, image_type);
+      newVideo.thumbnail = key;
+      await newVideo.save();
+    }
+    // await bunnyStream.setThumbnail(response.headers.VideoId, newVideo.thumb);
+
+    res.status(200).json({
+      message: "Video Uploaded Successfully.",
+      headers: response.headers,
+      thumbSignedUrl,
+    });
   } catch (e) {
+    console.log(e);
     res.status(400).json({
       error_code: "upload_video",
       message: e.message,
