@@ -1,10 +1,12 @@
 import { Video, Course_Progress } from "@/database/models";
+import { bunnyStream } from "pages/api/bunny";
 
 export default async function handler(req, res) {
   const { id, userId, courseId } = req.query;
   // console.log("###", req.query);
   try {
-    const video = await Video.findOne({ id });
+    const video = await Video.findById(id);
+    console.log(id, video);
     if (video) {
       const progress = await Course_Progress.findOne({
         userId: userId,
@@ -21,6 +23,8 @@ export default async function handler(req, res) {
       }
     }
 
+    const response = await bunnyStream.getVideo(video.video);
+    console.log(response);
     res.status(200).json({
       video,
     });

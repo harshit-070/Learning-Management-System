@@ -1,5 +1,4 @@
 export const calculateCartTotal = (courses) => {
-  console.log(courses);
   const total = courses.reduce((acc, el) => {
     acc += el.price * el.quantity;
     return acc;
