@@ -1,5 +1,5 @@
 import baseUrl from "@/utils/baseUrl";
-import { ses, transport } from "./config";
+import { ses } from "./config";
 
 export const confirmEmailAddress = async (user) => {
   const data = {
