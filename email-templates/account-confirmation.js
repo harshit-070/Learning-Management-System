@@ -2,7 +2,6 @@ import baseUrl from "@/utils/baseUrl";
 import { ses, transport } from "./config";
 
 export const confirmEmailAddress = async (user) => {
-  // console.log(user.email)
   const data = {
     Source: process.env.AWS_FROM_EMAIL,
     Destination: {
@@ -371,7 +370,7 @@ export const confirmEmailAddress = async (user) => {
 
   try {
     await ses.sendEmail(data).promise();
-    // console.log("Email send successfully")
+    console.log("Email send successfully");
     // res.status(200).send("Email send successfully")
   } catch (error) {
     console.log(error);
