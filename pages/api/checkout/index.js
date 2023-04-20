@@ -52,18 +52,18 @@ const handlePostRequest = async (req, res) => {
     console.log(cartItems);
 
     checkoutConfirmation(cartItems, buyer_name, buyer_email);
-    await stripeSecret.charges.create(
-      {
-        amount: stripeTotal,
-        currency: "inr",
-        source: "tok_mastercard",
-        receipt_email: buyer_email,
-        description: `Checkout | ${buyer_email} | ${userId}`,
-      },
-      {
-        idempotencyKey: uuidv4(),
-      }
-    );
+    // await stripeSecret.charges.create(
+    //   {
+    //     amount: stripeTotal,
+    //     currency: "inr",
+    //     source: "tok_mastercard",
+    //     receipt_email: buyer_email,
+    //     description: `Checkout | ${buyer_email} | ${userId}`,
+    //   },
+    //   {
+    //     idempotencyKey: uuidv4(),
+    //   }
+    // );
 
     res.status(200).json({
       message: "Enroled successfully.",

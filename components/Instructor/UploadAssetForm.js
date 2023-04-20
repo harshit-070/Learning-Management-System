@@ -33,24 +33,24 @@ const UploadAssetForm = ({ courseId, onFetchAssets }) => {
     let fileSize;
     if (name === "lecture_file") {
       fileSize = files[0].size / 1024 / 1024;
-      if (fileSize > 5) {
-        toast.error(
-          "The file size greater than 5 MB. Make sure less than 5 MB.",
-          {
-            style: {
-              border: "1px solid #ff0033",
-              padding: "16px",
-              color: "#ff0033",
-            },
-            iconTheme: {
-              primary: "#ff0033",
-              secondary: "#FFFAEE",
-            },
-          }
-        );
-        e.target.value = null;
-        return;
-      }
+      // if (fileSize > 5) {
+      //   toast.error(
+      //     "The file size greater than 5 MB. Make sure less than 5 MB.",
+      //     {
+      //       style: {
+      //         border: "1px solid #ff0033",
+      //         padding: "16px",
+      //         color: "#ff0033",
+      //       },
+      //       iconTheme: {
+      //         primary: "#ff0033",
+      //         secondary: "#FFFAEE",
+      //       },
+      //     }
+      //   );
+      //   e.target.value = null;
+      //   return;
+      // }
       setAsset((prevState) => ({
         ...prevState,
         lecture_file: files[0],
