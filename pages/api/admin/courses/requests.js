@@ -20,12 +20,17 @@ export default async function handler(req, res) {
 
 const handleGet = async (req, res) => {
   try {
-    const courses = await Course.find({ approved: false })
+    let courses = await Course.find({ approved: false })
       .sort({ created_at: -1 })
-      .populate("user", ["first_name", "last_name", "profile_photo"])
-      .populate("category", ["name", "slug"])
-      .populate("videos", ["title"]);
-
+      .populate("userId", ["first_name", "last_name", "profile_photo"])
+      .populate("catId", ["name", "slug"]);
+    courses = JSON.parse(JSON.stringify(courses));
+    for (let i = 0; i < courses.length; i++) {
+      const video = await Video.find({ courseId: courses[i]._id })
+        .lean(true)
+        .select({ title: 1 });
+      courses[i].videos = video;
+    }
     res.status(200).json({ courses });
   } catch (e) {
     res.status(400).json({
@@ -41,7 +46,7 @@ const handlePut = async (req, res) => {
     // console.log(courseId);
 
     if (approved) {
-      await Course.findByIdAndUpdate(courseId, { approved: true });
+      await Course.findOneAndUpdate({ _id: courseId }, { approved: true });
 
       res.status(200).json({ message: "Published course" });
     } else {

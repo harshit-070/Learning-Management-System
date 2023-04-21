@@ -61,12 +61,9 @@ const userSignup = async (req, res) => {
       password: passwordHash,
       reset_password_token: confirmToken,
       reset_password_send_at: Date.now(),
-      // To be removed
-      email_confirmed: true,
-      email_confirmed_at: Date.now(),
     });
 
-    // confirmEmailAddress(newUser);
+    confirmEmailAddress(newUser);
 
     const edmy_users_token = jwt.sign(
       {

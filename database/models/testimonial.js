@@ -3,24 +3,27 @@ import mongoose from "mongoose";
 if (!mongoose.models.Testimonial) {
   const testimonialSchema = new mongoose.Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
-      image_url: { type: String, required: true },
+      image: { type: String },
       name: { type: String, required: true },
       designation: { type: String, required: true },
       description: { type: String, required: true },
     },
     {
       timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
 
-  Testimonial = mongoose.model("Testimonial", testimonialSchema);
+  testimonialSchema.virtual("id", function () {
+    return this._id;
+  });
+  testimonialSchema.virtual("image_url").get(function () {
+    return `${process.env.CLOUDFRONT_URL}/${this.image}`;
+  });
+
+  let Testimonial = mongoose.model("Testimonial", testimonialSchema);
 }
+
 let Testimonial = mongoose.model("Testimonial");
 export default Testimonial;

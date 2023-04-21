@@ -3,13 +3,6 @@ import mongoose from "mongoose";
 if (!mongoose.models.Enrolment) {
   const enrolmentSchema = new mongoose.Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       bought_price: {
         type: Number,
         required: true,
@@ -51,8 +44,14 @@ if (!mongoose.models.Enrolment) {
         createdAt: "created_at",
         updatedAt: "updated_at",
       },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
+
+  enrolmentSchema.virtual("id", function () {
+    return this._id;
+  });
 
   let Enrolment = mongoose.model("Enrolment", enrolmentSchema);
 }

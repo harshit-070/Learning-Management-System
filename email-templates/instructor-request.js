@@ -385,5 +385,4 @@ export const instructorRequest = async (
     console.log(error);
     // res.status(500).send("Error proccessing charge");
   }
-  transport.close();
 };

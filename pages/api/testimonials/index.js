@@ -16,7 +16,6 @@ export default async function handler(req, res) {
 const handleGet = async (req, res) => {
   try {
     const testimonials = await Testimonial.find({}).sort({ created_at: -1 });
-
     res.status(200).json({ testimonials });
   } catch (e) {
     res.status(400).json({

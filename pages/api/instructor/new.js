@@ -31,7 +31,7 @@ const handlePut = async (req, res) => {
       id: userId,
       instructor_request: true,
     });
-
+    console.log("User :", userId);
     const admins = await User.find({
       role: "admin",
     });
@@ -40,9 +40,10 @@ const handlePut = async (req, res) => {
       res.status(422).json({ message: "Already sent a request." });
     } else {
       const instructor = await User.updateOne(
-        { id: userId },
+        { _id: userId },
         {
           instructor_request: true,
+          instructor_request_confirmed: false,
           instructor_subject,
           instructor_description,
           phone,

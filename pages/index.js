@@ -105,7 +105,6 @@ export async function getServerSideProps() {
   // Fetch data from external API
   const res = await fetch(`${baseUrl}/api/home-courses`);
   const { courses, categories } = await res.json();
-  console.log(courses, categories);
   // Pass data to the page via props
   return { props: { courses, categories } };
 }

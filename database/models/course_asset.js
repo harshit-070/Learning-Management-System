@@ -3,13 +3,6 @@ import mongoose from "mongoose";
 if (!mongoose.models.Course_Asset) {
   const courseAssetSchema = new mongoose.Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       lecture_name: String,
       lecture_file: String,
       courseId: {
@@ -20,8 +13,14 @@ if (!mongoose.models.Course_Asset) {
     },
     {
       timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
+
+  courseAssetSchema.virtual("id", function () {
+    return this._id;
+  });
 
   let Course_Asset = mongoose.model("Course_Asset", courseAssetSchema);
 }

@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "database/models/user";
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   if (!("authorization" in req.headers)) {
     return res.status(401).json({ message: "No autorization token" });
@@ -26,9 +27,7 @@ const userGetById = async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    const user = await User.findOne({
-      id: userId,
-    });
+    const user = await User.findById(userId);
 
     res.status(200).json({ user });
   } catch (e) {
@@ -58,7 +57,7 @@ const userUpdate = async (req, res) => {
     );
 
     await User.update(
-      { id: userId },
+      { _id: userId },
       {
         first_name,
         last_name,

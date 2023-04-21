@@ -10,172 +10,186 @@ import baseUrl from "@/utils/baseUrl";
 import Button from "@/utils/Button";
 
 const Photo = ({ user }) => {
-	const { edmy_users_token } = parseCookies();
-	const router = useRouter();
-	const [avatar, setAvatar] = useState(user);
-	const [loading, setLoading] = React.useState(false);
-	const [profilePreview, setProfilePreview] = React.useState("");
+  const { edmy_users_token } = parseCookies();
+  const router = useRouter();
+  const [avatar, setAvatar] = useState(user);
+  const [loading, setLoading] = React.useState(false);
+  const [profilePreview, setProfilePreview] = React.useState("");
 
-	const handleChange = (e) => {
-		const { files } = e.target;
+  const handleChange = (e) => {
+    const { files } = e.target;
 
-		const profilePhotoSize = files[0].size / 1024 / 1024;
-		if (profilePhotoSize > 2) {
-			toast.error(
-				"The profile photo size greater than 2 MB. Make sure less than 2 MB.",
-				{
-					style: {
-						border: "1px solid #ff0033",
-						padding: "16px",
-						color: "#ff0033",
-					},
-					iconTheme: {
-						primary: "#ff0033",
-						secondary: "#FFFAEE",
-					},
-				}
-			);
-			e.target.value = null;
-			return;
-		}
+    const profilePhotoSize = files[0].size / 1024 / 1024;
+    if (profilePhotoSize > 2) {
+      toast.error(
+        "The profile photo size greater than 2 MB. Make sure less than 2 MB.",
+        {
+          style: {
+            border: "1px solid #ff0033",
+            padding: "16px",
+            color: "#ff0033",
+          },
+          iconTheme: {
+            primary: "#ff0033",
+            secondary: "#FFFAEE",
+          },
+        }
+      );
+      e.target.value = null;
+      return;
+    }
 
-		setAvatar({
-			profile_photo: files[0],
-		});
-		setProfilePreview(window.URL.createObjectURL(files[0]));
-	};
+    setAvatar({
+      profile_photo: files[0],
+    });
+    setProfilePreview(window.URL.createObjectURL(files[0]));
+  };
 
-	const handleProfilePhotoUpload = async () => {
-		// console.log(avatar);
-		const data = new FormData();
-		data.append("file", avatar.profile_photo);
-		data.append("upload_preset", process.env.UPLOAD_PRESETS);
-		data.append("cloud_name", process.env.CLOUD_NAME);
+  const getImageType = () => {
+    if (avatar.profile_photo) {
+      const fileExtension = avatar.profile_photo.name.split(".").pop();
+      return `image/${fileExtension}`;
+    }
+  };
 
-		let response;
-		if (avatar) {
-			response = await axios.post(process.env.CLOUDINARY_URL, data);
-		}
-		const profilePhotoUrl = response.data.url;
-		return profilePhotoUrl;
-	};
+  const handleImageUpload = async (signedUrl) => {
+    const mimeType = getImageType();
+    const response = await fetch(signedUrl, {
+      method: "PUT",
+      headers: { "Content-Type": mimeType },
+      body: avatar.profile_photo,
+    });
+    console.log(response);
+  };
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		try {
-			// console.log(avatar);
-			let profile = "";
-			if (avatar) {
-				profile = await handleProfilePhotoUpload();
-				profile = profile.replace(/^http:\/\//i, "https://");
-			}
-			// console.log(profile);
-			const url = `${baseUrl}/api/users/profile-photo`;
-			const payload = {
-				profile_photo: profile,
-			};
-			const response = await axios.put(url, payload, {
-				headers: { Authorization: edmy_users_token },
-			});
-			setLoading(false);
-			toast.success(response.data.message);
-			router.push("/");
-		} catch (err) {
-			let {
-				response: {
-					data: { message },
-				},
-			} = err;
-			toast.error(message, {
-				style: {
-					border: "1px solid #ff0033",
-					padding: "16px",
-					color: "#ff0033",
-				},
-				iconTheme: {
-					primary: "#ff0033",
-					secondary: "#FFFAEE",
-				},
-			});
-		} finally {
-			setLoading(false);
-		}
-	};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // console.log(avatar);
+      let profile = "";
+      // if (avatar) {
+      //   profile = await handleProfilePhotoUpload();
+      //   profile = profile.replace(/^http:\/\//i, "https://");
+      // }
+      // console.log(profile);
+      const url = `${baseUrl}/api/users/profile-photo?image_type=${getImageType()}`;
 
-	return (
-		<>
-			<Navbar user={user} />
+      const r = await axios.get(url, {
+        headers: { Authorization: edmy_users_token },
+      });
 
-			<div className="ptb-100">
-				<div className="container">
-					<h2 className="fw-bold mb-4">Profile & Settings</h2>
+      await handleImageUpload(r.data.signedUrl);
 
-					<ul className="nav-style1">
-						<li>
-							<Link href="/profile/basic-information">
-								<a>Profile</a>
-							</Link>
-						</li>
-						<li>
-							<Link href="/profile/photo">
-								<a className="active">Profile Picture</a>
-							</Link>
-						</li>
-					</ul>
+      const image_update = `${baseUrl}/api/users/profile-photo`;
 
-					<div className="basic-profile-information-form">
-						<form onSubmit={handleSubmit}>
-							<div className="row">
-								<div className="col-md-6">
-									<div className="form-group">
-										<label className="form-label fw-semibold">
-											Profile Image
-										</label>
-										<input
-											type="file"
-											className="form-control file-control"
-											name="profilePhoto"
-											accept="image/*"
-											onChange={handleChange}
-											required={true}
-										/>
-										<div className="form-text mt-2">
-											Upload image size 200x200 pixels!
-										</div>
+      const response = await axios.put(
+        image_update,
+        {},
+        {
+          headers: { Authorization: edmy_users_token },
+        }
+      );
 
-										<div className="mt-3">
-											{profilePreview ? (
-												<img
-													src={profilePreview}
-													className="img-thumbnail mw-200px"
-												/>
-											) : (
-												<img
-													src="/images/avatar.jpg"
-													alt="image"
-													className="img-thumbnail mw-200px"
-												/>
-											)}
-										</div>
-									</div>
-								</div>
+      setLoading(false);
+      toast.success(response.data.message);
+      router.push("/");
+    } catch (err) {
+      console.log(err);
+      let {
+        response: {
+          data: { message },
+        },
+      } = err;
+      toast.error(message, {
+        style: {
+          border: "1px solid #ff0033",
+          padding: "16px",
+          color: "#ff0033",
+        },
+        iconTheme: {
+          primary: "#ff0033",
+          secondary: "#FFFAEE",
+        },
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-								<div className="col-12">
-									<Button
-										loading={loading}
-										btnText="Upload"
-										btnClass="btn default-btn"
-									/>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
+  return (
+    <>
+      <Navbar user={user} />
 
-			<Footer />
-		</>
-	);
+      <div className="ptb-100">
+        <div className="container">
+          <h2 className="fw-bold mb-4">Profile & Settings</h2>
+
+          <ul className="nav-style1">
+            <li>
+              <Link href="/profile/basic-information">
+                <a>Profile</a>
+              </Link>
+            </li>
+            <li>
+              <Link href="/profile/photo">
+                <a className="active">Profile Picture</a>
+              </Link>
+            </li>
+          </ul>
+
+          <div className="basic-profile-information-form">
+            <form onSubmit={handleSubmit}>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <label className="form-label fw-semibold">
+                      Profile Image
+                    </label>
+                    <input
+                      type="file"
+                      className="form-control file-control"
+                      name="profilePhoto"
+                      accept="image/*"
+                      onChange={handleChange}
+                      required={true}
+                    />
+                    <div className="form-text mt-2">
+                      Upload image size 200x200 pixels!
+                    </div>
+
+                    <div className="mt-3">
+                      {profilePreview ? (
+                        <img
+                          src={profilePreview}
+                          className="img-thumbnail mw-200px"
+                        />
+                      ) : (
+                        <img
+                          src="/images/avatar.jpg"
+                          alt="image"
+                          className="img-thumbnail mw-200px"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-12">
+                  <Button
+                    loading={loading}
+                    btnText="Upload"
+                    btnClass="btn default-btn"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </>
+  );
 };
 
 export default Photo;

@@ -24,7 +24,6 @@ const handleGet = async (req, res) => {
       instructor_request: true,
       instructor_request_confirmed: false,
     });
-
     res.status(200).json({ instructors });
   } catch (e) {
     res.status(400).json({
@@ -40,7 +39,7 @@ const handlePut = async (req, res) => {
 
     if (approve) {
       await User.updateOne(
-        { id: instId },
+        { _id: instId },
         {
           role: "instructor",
           instructor_request_confirmed: true,
@@ -50,7 +49,7 @@ const handlePut = async (req, res) => {
       res.status(200).json({ message: "Approve instructor request" });
     } else {
       await User.updateOne(
-        { id: instId },
+        { _id: instId },
         {
           instructor_request: false,
         }

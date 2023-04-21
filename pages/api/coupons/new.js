@@ -63,7 +63,6 @@ const handlePostRequest = async (req, res) => {
 
 const handlePutRequest = async (req, res) => {
   const { couponId } = req.body;
-  console.log(couponId);
   try {
     const coupons = await Coupon.find().select("_id");
 
@@ -72,9 +71,9 @@ const handlePutRequest = async (req, res) => {
       couponIds.push(cp._id);
     });
 
-    Coupon.update({ id: couponIds }, { active_for_full_site: false });
+    Coupon.update({ _id: couponIds }, { active_for_full_site: false });
 
-    Coupon.update({ id: couponId }, { active_for_full_site: true });
+    Coupon.update({ _id: couponId }, { active_for_full_site: true });
 
     res.status(200).json({
       message: "Coupon code activated for all courses",

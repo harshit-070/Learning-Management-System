@@ -3,13 +3,6 @@ import mongoose from "mongoose";
 if (!mongoose.models.Coupon) {
   const couponSchema = new mongoose.Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       code: {
         type: String,
         required: true,
@@ -39,8 +32,14 @@ if (!mongoose.models.Coupon) {
         createdAt: "created_at",
         updatedAt: "updated_at",
       },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
+
+  couponSchema.virtual("id", function () {
+    return this._id;
+  });
 
   let Coupon = mongoose.model("Coupon", couponSchema);
 }

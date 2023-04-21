@@ -1,16 +1,10 @@
 import mongoose from "mongoose";
+import Video from "./video";
 const { Schema } = mongoose;
 
 if (!mongoose.models.Course) {
   const CourseSchema = new Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       title: {
         type: String,
         required: true,
@@ -25,7 +19,6 @@ if (!mongoose.models.Course) {
       },
       overview: {
         type: String,
-        required: true,
       },
       latest_price: {
         type: Number,
@@ -45,7 +38,7 @@ if (!mongoose.models.Course) {
       },
       image: {
         type: String,
-        required: true,
+        // required: true,
       },
       access_time: {
         type: String,
@@ -54,32 +47,31 @@ if (!mongoose.models.Course) {
       },
       requirements: {
         type: String,
-        required: true,
       },
       what_you_will_learn: {
         type: String,
-        required: true,
       },
       who_is_this_course_for: {
         type: String,
-        required: true,
       },
       userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true,
       },
-      categoryId: {
+      catId: {
         type: Schema.Types.ObjectId,
         ref: "Category",
         required: true,
       },
       approved: {
         type: Boolean,
+        default: false,
         required: true,
       },
       in_home_page: {
         type: Boolean,
+        default: false,
         required: true,
       },
       in_home_page_set_at: {
@@ -96,8 +88,22 @@ if (!mongoose.models.Course) {
         createdAt: "created_at",
         updatedAt: "updated_at",
       },
+      toJSON: {
+        virtuals: true,
+      },
+      toObject: { virtuals: true },
     }
   );
+
+  CourseSchema.virtual("id", function () {
+    return this._id;
+  });
+  CourseSchema.virtual("user").get(function () {
+    return this.userId;
+  });
+  CourseSchema.virtual("category").get(function () {
+    return this.catId;
+  });
 
   let Course = mongoose.model("Course", CourseSchema);
 }

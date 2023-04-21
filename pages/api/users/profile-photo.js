@@ -1,11 +1,16 @@
 import jwt from "jsonwebtoken";
 import User from "database/models/user";
+import { getUploadSignedUrl } from "../s3";
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   if (!("authorization" in req.headers)) {
     return res.status(401).json({ message: "No autorization token" });
   }
   switch (req.method) {
+    case "GET":
+      await getProfilePhotoUrl(req, res);
+      break;
     case "PUT":
       await userProfilePhoto(req, res);
       break;
@@ -16,24 +21,42 @@ export default async (req, res) => {
   }
 };
 
+const getProfilePhotoUrl = async (req, res) => {
+  const { image_type } = req.query;
+
+  try {
+    const { userId } = jwt.verify(
+      req.headers.authorization,
+      process.env.JWT_SECRET
+    );
+    const key = `user/${userId}`;
+    const signedUrl = await getUploadSignedUrl(key, image_type);
+
+    await User.findByIdAndUpdate(userId, { profile: key });
+
+    await res.status(200).json({
+      message: "Profile photo upload.",
+      signedUrl,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      error_code: "update_user_image",
+      message: e.message,
+    });
+  }
+};
+
 const userProfilePhoto = async (req, res) => {
-  const { profile_photo } = req.body;
   try {
     const { userId } = jwt.verify(
       req.headers.authorization,
       process.env.JWT_SECRET
     );
 
-    await User.update(
-      { id: userId },
-      {
-        profile_photo,
-      }
-    );
+    const updateUser = await User.findById(userId);
 
-    const updateUser = await User.findOne({
-      id: userId,
-    });
+    console.log(updateUser, updateUser.profile_photo);
 
     const edmy_users_token = jwt.sign(
       {

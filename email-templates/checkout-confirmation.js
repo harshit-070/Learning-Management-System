@@ -1,5 +1,5 @@
 import baseUrl from "@/utils/baseUrl";
-import { ses, transport } from "./config";
+import { ses } from "./config";
 
 export const checkoutConfirmation = async (cartItems, name, email) => {
   // console.log(user.email)
@@ -348,8 +348,11 @@ export const checkoutConfirmation = async (cartItems, name, email) => {
                                     <th width="20%" style="text-align:right; padding: 0 2.5em; color: #000; padding-bottom: 20px">Price</th>
                                 </tr>
 
-                                ${cartItems.map((cart) => (
-                                  <tr style="border-bottom: 1px solid rgba(0,0,0,.05);">
+                                ${cartItems.map((cart, index) => (
+                                  <tr
+                                    style="border-bottom: 1px solid rgba(0,0,0,.05);"
+                                    key={index}
+                                  >
                                     <td
                                       valign="middle"
                                       width="80%"
@@ -406,10 +409,8 @@ export const checkoutConfirmation = async (cartItems, name, email) => {
   try {
     await ses.sendEmail(data).promise();
     console.log("Email send successfully");
-    // res.status(200).send("Email send successfully")
   } catch (error) {
     console.log("########", error);
     // res.status(500).send("Error proccessing charge");
   }
-  transport.close();
 };

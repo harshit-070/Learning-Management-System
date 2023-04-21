@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
 const handleGet = async (req, res) => {
   try {
-    const instructors = await User.findAll({
+    const instructors = await User.find({
       instructor_request_confirmed: true,
     });
 

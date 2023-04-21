@@ -4,13 +4,6 @@ const { Schema } = mongoose;
 if (!mongoose.models.Favourite) {
   const favouriteSchema = new Schema(
     {
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        index: true,
-        required: true,
-        auto: true,
-        alias: "_id",
-      },
       userId: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -24,8 +17,14 @@ if (!mongoose.models.Favourite) {
     },
     {
       timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
+
+  favouriteSchema.virtual("id", function () {
+    return this._id;
+  });
 
   let Favourite = mongoose.model("Favourite", favouriteSchema);
 }

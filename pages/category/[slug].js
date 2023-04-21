@@ -8,40 +8,41 @@ import axios from "axios";
 import baseUrl from "@/utils/baseUrl";
 
 export default function CoursesPage({ user }) {
-	const [courses, setCourses] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const router = useRouter();
-	const { slug } = router.query;
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const { slug } = router.query;
 
-	const fetchCourses = async () => {
-		setLoading(true);
+  const fetchCourses = async () => {
+    setLoading(true);
 
-		const response = await axios.get(`${baseUrl}/api/categories/${slug}`);
-		setCourses(response.data.courses.courses);
-		setLoading(false);
-	};
+    const response = await axios.get(`${baseUrl}/api/categories/${slug}`);
+    console.log(response);
+    setCourses(response.data.courses.courses);
+    setLoading(false);
+  };
 
-	useEffect(() => {
-		fetchCourses();
-	}, [slug]);
-	return (
-		<>
-			<Navbar user={user} />
+  useEffect(() => {
+    fetchCourses();
+  }, [slug]);
+  return (
+    <>
+      <Navbar user={user} />
 
-			<PageBanner
-				pageTitle="Category"
-				homePageUrl="/"
-				homePageText="Home"
-				activePageText="Category"
-			/>
+      <PageBanner
+        pageTitle="Category"
+        homePageUrl="/"
+        homePageText="Home"
+        activePageText="Category"
+      />
 
-			<div className="pt-100 pb-70">
-				<div className="container">
-					<CoursesList courses={courses} user={user} />
-				</div>
-			</div>
+      <div className="pt-100 pb-70">
+        <div className="container">
+          <CoursesList courses={courses} user={user} />
+        </div>
+      </div>
 
-			<Footer />
-		</>
-	);
+      <Footer />
+    </>
+  );
 }

@@ -14,7 +14,6 @@ export default async function handler(req, res) {
 
 const handleGetRequest = async (req, res) => {
   try {
-    console.log("Request Called");
     const courses = await Course.aggregate([
       { $match: { in_home_page: true, approved: true } },
       { $sample: { size: 4 } },
@@ -24,6 +23,11 @@ const handleGetRequest = async (req, res) => {
           localField: "userId",
           foreignField: "_id",
           as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
         },
       },
       {

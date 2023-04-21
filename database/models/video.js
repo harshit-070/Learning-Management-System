@@ -4,7 +4,7 @@ if (!mongoose.models.Video) {
     {
       group_name: { type: String },
       title: { type: String },
-      thumb: { type: String },
+      thumbnail: { type: String },
       video: { type: String },
       video_length: { type: Number },
       is_preview: { type: Boolean },
@@ -26,10 +26,18 @@ if (!mongoose.models.Video) {
         createdAt: "created_at",
         updatedAt: "updated_at",
       },
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true },
     }
   );
 
-  Video = mongoose.model("Video", videoSchema);
+  videoSchema.virtual("id", function () {
+    return this._id;
+  });
+  videoSchema.virtual("thumb").get(function () {
+    return `${process.env.CLOUDFRONT_URL}/thumb/${this._id}`;
+  });
+  let Video = mongoose.model("Video", videoSchema);
 }
 let Video = mongoose.model("Video");
 export default Video;
