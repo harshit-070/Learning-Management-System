@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { useStore } from "../store";
 import { parseCookies, destroyCookie } from "nookies";
@@ -28,8 +28,7 @@ import "../styles/dashboard.css";
 import Layout from "../components/_App/Layout";
 import connection from "@/database/connection";
 
-function MyApp({ Component, pageProps }) {
-  connection.connect();
+ function  MyApp({ Component, pageProps }) {
   const store = useStore(pageProps.initialReduxState);
   return (
     <Provider store={store}>
@@ -41,6 +40,7 @@ function MyApp({ Component, pageProps }) {
 }
 
 MyApp.getInitialProps = async ({ Component, ctx }) => {
+  await connection.connect();
   const { edmy_users_token } = parseCookies(ctx);
   let pageProps = {};
 
