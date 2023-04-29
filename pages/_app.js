@@ -29,7 +29,6 @@ import Layout from "../components/_App/Layout";
 import connection from "@/database/connection";
 
 function MyApp({ Component, pageProps }) {
-  connection.connect();
   const store = useStore(pageProps.initialReduxState);
   return (
     <Provider store={store}>
@@ -41,6 +40,8 @@ function MyApp({ Component, pageProps }) {
 }
 
 MyApp.getInitialProps = async ({ Component, ctx }) => {
+  await connection.connect();
+
   const { edmy_users_token } = parseCookies(ctx);
   let pageProps = {};
 
