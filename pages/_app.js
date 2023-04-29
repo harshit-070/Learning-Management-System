@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { useStore } from "../store";
 import { parseCookies, destroyCookie } from "nookies";
@@ -41,7 +41,6 @@ function MyApp({ Component, pageProps }) {
 
 MyApp.getInitialProps = async ({ Component, ctx }) => {
   await connection.connect();
-
   const { edmy_users_token } = parseCookies(ctx);
   let pageProps = {};
 
