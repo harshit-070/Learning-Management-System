@@ -8,7 +8,6 @@ export const handleLogin = async (t, routeNext) => {
       new Date().getTime() + 7 * 24 * 60 * 60 * 1000
     ); // set the expiration to 7 days from now
     const response = Cookies.set("edmy_users_token", t, {
-      domain: "localhost",
       path: "/",
       sameSite: "None",
       secure: false,
