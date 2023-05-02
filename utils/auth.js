@@ -10,7 +10,7 @@ export const handleLogin = async (t, routeNext) => {
     const response = Cookies.set("edmy_users_token", t, {
       path: "/",
       sameSite: "None",
-      secure: false,
+      secure: true,
       expires: expirationDate,
     });
 
