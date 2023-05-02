@@ -2,7 +2,6 @@ import Cookies from "js-cookie";
 import Router from "next/router";
 
 export const handleLogin = async (t, routeNext) => {
-  console.log(t);
   try {
     const expirationDate = new Date(
       new Date().getTime() + 7 * 24 * 60 * 60 * 1000
