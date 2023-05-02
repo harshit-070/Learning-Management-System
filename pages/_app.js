@@ -39,8 +39,9 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
+connection.connect();
+
 MyApp.getInitialProps = async ({ Component, ctx }) => {
-  await connection.connect();
   const { edmy_users_token } = parseCookies(ctx);
   let pageProps = {};
 
