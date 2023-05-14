@@ -2,16 +2,14 @@ import Cookies from "js-cookie";
 import Router from "next/router";
 
 export const handleLogin = async (t, routeNext) => {
-  console.log(t);
   try {
     const expirationDate = new Date(
       new Date().getTime() + 7 * 24 * 60 * 60 * 1000
     ); // set the expiration to 7 days from now
     const response = Cookies.set("edmy_users_token", t, {
-      domain: "localhost",
       path: "/",
       sameSite: "None",
-      secure: false,
+      secure: true,
       expires: expirationDate,
     });
 

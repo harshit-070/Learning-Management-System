@@ -28,7 +28,7 @@ import "../styles/dashboard.css";
 import Layout from "../components/_App/Layout";
 import connection from "@/database/connection";
 
- function  MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }) {
   const store = useStore(pageProps.initialReduxState);
   return (
     <Provider store={store}>
@@ -39,8 +39,9 @@ import connection from "@/database/connection";
   );
 }
 
+connection.connect();
+
 MyApp.getInitialProps = async ({ Component, ctx }) => {
-  await connection.connect();
   const { edmy_users_token } = parseCookies(ctx);
   let pageProps = {};
 
