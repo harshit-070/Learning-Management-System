@@ -17,6 +17,9 @@ async function connect() {
     mongoose.connection.on("error", (err) => {
       console.error(`Error connecting to MongoDB: ${err.message}`);
     });
+    mongoose.connection.on("disconnected", (err) => {
+      console.error(`Error connecting to MongoDB: ${err}`);
+    });
   } catch (error) {
     console.log("MongoDB Connection Error:", error);
   }

@@ -2,6 +2,6 @@
 //   ? process.env.BASE_URL
 //   : "http://localhost:3000";
 
-const baseUrl = "https://lms-bice-sigma.vercel.app";
+const baseUrl = "http://localhost:3000";
 
 export default baseUrl;
